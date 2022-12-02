@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>SAH</title>
+
+    {% load static %}
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link  href="{% static "css/font-awesome.min.css" %}"  rel="stylesheet">
+    <link href="{% static "css/prettyPhoto.css" %}"  rel="stylesheet">
+    <link href="{% static "css/price-range.css" %}" rel="stylesheet">
+    <link href="{% static "css/animate.css" %}" rel="stylesheet">
+    <link href="{% static "css/main.css" %}" rel="stylesheet">
+    <link href="{% static "css/responsive.css" %}" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script  src="{% static 'js/html5shiv.js' %}" ></script>
+    <script  src="{% static 'js/respond.min.js' %}" ></script>
+    <![endif]-->
+
+</head><!--/head-->
+
+<body >
+
+	<header ><!--header-->
+
+		<div style="background-color: #2a6496" ><!--header-middle-->
+			<div class="container">
+				<div class="row">
+					<div class="col-md-4 clearfix">
+						<div class="logo pull-left"  style="margin-top: 60px">
+                            <a href="{% url "home" %}" > <span style="color: darkorange; font-size: 40px;"   >Tech</span></a><span style="color: whitesmoke; font-size: 40px;"   >IST</span></a>
+						</div>
+					</div>
+
+					<div class="col-md-12 clearfix">
+						<div class="shop-menu clearfix pull-right">
+							<ul style="float:right" class="nav navbar-nav">
+								<li><a style="background-color: #2a6496; color: white" href="{% url 'account' %}"><i class="fa fa-user"></i> Account {{ Credits }}</a></li>
+
+
+                                {% if user.is_authenticated %}
+								    <li><a style="background-color: #2a6496; color: white"  href="" > Welcome, {{ user.get_username }}</a></li>
+                                    <li ><a style="background-color: #2a6496; color:white"  href="{% url "logout" %}"><i class="icon-signout"></i>Logout </a></li>
+                                {% else %}
+								    <li><a style="background-color: #2a6496; color:white" href="{% url 'login' %}" ><i class="fa fa-sign-in" aria-hidden="true"></i>Login</a></li>
+                                {%  endif %}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--/header-middle-->
+
+<!--header-bottom-->
+		<div class="header-bottom">
+			<div class="container " >
+				<div class="row">
+					<div class="col-sm-12">
+
+						<div class="mainmenu  col-sm-12  pull-left" >
+							<ul style="float:left" class="nav navbar-nav collapse navbar-collapse">
+								<li><a href="{% url 'home' %}" >Home</a></li>
+                                <li><a href="" >Products</a></li>
+                                <li><a  href="">Cart</a></li>
+
+
+                                </li>
+
+                                                                <!--ADMIN -->
+                                {% if user.is_authenticated and user.is_superuser %}
+                                    <li class="dropdown"><a href="#"><strong style="color: darkorange">Management<i class="fa fa-angle-down"></i></strong></a>
+                                    <ul role="menu" class="sub-menu">
+                                        <li><a href="" ><i class="fa fa-cog"></i>  Products </a></li>
+                                        <li><a href="" ><i class="fa fa-cog"></i> Users </a></li>
+                                        <li><a href="" ><i class="fa fa-cog"></i> Comments </a></li>
+                                    </ul>
+                                </li>
+
+                                {%  endif %}
+							</ul>
+						</div>
+					</div>
+
+				</div>
+				</div>
+			</div>
+	</header>
+
+
+
+
+            {% block content %}
+
+
+            {% endblock %}
+
+    <!-- Plugin JavaScript -->
+    <script src="{% static 'js/jquery.js' %}" ></script>
+	<script src="{% static 'js/price-range.js' %}"></script>
+    <script src="{% static 'js/jquery.scrollUp.min.js' %}" ></script>
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script src="{% static 'js/bootstrap.min.js' %}" ></script>
+    <script src="{% static 'js/jquery.prettyPhoto.js' %}" ></script>
+    <script src="{% static 'js/main.js' %}" ></script>
+            <script>
+
+        $(function() {
+        setTimeout(function() { $("#hideDiv").fadeOut(1500); }, 1000)
+
+        })
+    </script>
+
+{% block scripts %}{% endblock %}
+
+
+</body>
+</html>

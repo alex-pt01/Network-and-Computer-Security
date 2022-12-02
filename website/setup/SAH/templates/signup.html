@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+	<section id="form"><!--form-->
+				<div    style="  margin:auto;
+                      width:40%;
+                      padding:63px;
+                      ">
+					<div class="signup-form"><!--sign up form-->
+						<h2>New User Signup!</h2>
+					    <form method="POST" action="">
+						    {% csrf_token %}
+                            <label>Username</label>
+                            {{ form.username }}
+                            <label>Email</label>
+                            {{ form.email }}
+
+                            <label>Enter Password</label>
+                            {{ form.password1 }}
+
+                            <label>Re-enter Password</label>
+                            {{ form.password2 }}
+
+							<button style="float:right;" type="submit" class="btn btn-default">Signup</button>
+						</form>
+                        {{ form.errors }}
+		</div>
+                </div><!--/sign up form-->
+
+				</div>
+
+			</div>
+    </div>
+	</section><!--/form-->
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
