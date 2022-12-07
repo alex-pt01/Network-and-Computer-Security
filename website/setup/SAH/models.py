@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from datetime import datetime
-from django.conf import settings
-
+from django.conf import settings    
 from django.contrib.auth.models import User
 
 
@@ -42,25 +41,25 @@ class Doctor(models.Model):
 class Consult(models.Model):
     pacient = models.ForeignKey(Pacient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    date_now = models.DateTimeField(default=datetime.now)
+    scheduled_date = models.DateTimeField(default=datetime.now)
+    consult_date = models.DateTimeField( blank=True, null=True)
+    status = models.CharField(max_length=150, choices=(('Waiting','Waiting'),('In Progress','In Progress'), ('Done','Done')))
 
-    consult_date = models.DateField( blank=True, null=True)
     description = models.CharField(max_length=150)
     def __str__(self):
-        return self.user.get_username
+        return "Consult Date: " + str(self.consult_date) + " --- Doctor:    " + self.doctor.name + " --- Pacient: " + self.pacient.name
 
 class Room(models.Model):
     number = models.IntegerField( blank=True, null=True)
     floor = models.IntegerField( blank=True, null=True)
     def __str__(self):
-        return self.number
+        return "Floor: " + str(self.floor) + " --- Number: " + str(self.number)
 
-class ConsultReservation(models.Model):
-    room = models.OneToOneField(Room, on_delete=models.CASCADE)
-    consult = models.OneToOneField(Consult, on_delete=models.CASCADE)
+class ConsultRoomReservation(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    consult = models.ForeignKey(Consult, on_delete=models.CASCADE)
     def __str__(self):
-        return self.consult.doctor.speciality.name
-
+        return self.consult.doctor.specialization.name
 
 class Meta:
     app_label  = 'SAH'

@@ -18,9 +18,29 @@ urlpatterns = [
     path('doctor-signup/', views.doctor_signup, name='doctor-signup'),
     path('pacient-signup/', views.pacient_signup, name='pacient-signup'),
 
+    path('delete-user/<str:id>', views.delete_user, name='delete-user'),
+    path('update-user/', views.update_user, name='update-user'),
+    path('update-doctor/<str:doctor_id>/', views.update_doctor, name='update-doctor'),
+    path('update-pacient/<str:pacient_id>/', views.update_pacient, name='update-pacient'),
 
 
+    #HOSPITAL
+    path('consults-management/', views.consults_management, name='consults-management'),
+    path('create-consult/', views.create_consult, name='create-consult'),
+    path('deleteConsult/<str:id>', views.deleteConsult, name='deleteConsult'),
+    path('update-consult/<str:id>/', views.update_consult, name='update-consult'),
 
+    path('users-management/', views.users_management, name='users-management'),
+    path('deletePacient/<str:id>', views.deletePacient, name='deletePacient'),
+    path('deleteDoctor/<str:id>', views.deleteDoctor, name='deleteDoctor'),
+
+    path('room-consult-management/', views.room_consult_management, name='room-consult-management'),
+    path('create-room-consult/', views.create_room_consult, name='create-room-consult'),
+    path('deleteRoomConsult/<str:id>', views.deleteRoomConsult, name='deleteRoomConsult'),
+    path('update-room-consult/<str:id>/', views.update_room_consult, name='update-room-consult'),
+
+    path('doctor-info/<str:id>/', views.doctor_info, name='doctor-info'),
+    path('pacient-info/<str:id>/', views.pacient_info, name='pacient-info'),
 
 
 

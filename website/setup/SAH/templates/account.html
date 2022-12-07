@@ -4,9 +4,9 @@
 	<section id="form">
 				<div    style="  margin:auto;
                       width:20%;
-                    
                      ">
-					<div class="login-form" style="width:300px; height: 300px; text-align: center; margin-left: 30px; border: #2a6496; border-style: solid"><!--login form-->
+        
+                    <div class="login-form" style="width:300px; height: 300px; text-align: center; margin-left: 30px; border: #2a6496; border-style: solid"><!--login form-->
 						<h2>My Account</h2>
 
                         <label>Name:</label>
@@ -20,91 +20,29 @@
                         <br>
                         <label>Email:</label>
                         {{ user.email }}
-                        <br>
-                        <label>Credits:</label>
-                        {{ credits }}€
+                        
                         <p>
-                            <a class="btn btn-sm btn-danger" href="{% url 'deleteUser' user.id %}">Delete Account</a>
+                            <a class="btn btn-sm btn-danger" href="{% url 'delete-user' user.id %}">Delete Account</a>
 					    </p>
                         <p>
-                            <a class="btn btn-sm btn-info" href="{% url 'updateUser' %}">Update Account</a>
+                            <a class="btn btn-sm btn-info" href="{% url 'update-user' %}">Update Account</a>
+                        </p>
+                        <p>
+
+                        {% if user_type == 'D' %}
+                        <a class="btn btn-sm btn-success" style="
+                        float:right; margin-right:20%"  href="update-doctor/{{ doctor.id }}" > Update Personal info </a>
+                        {% else %}
+                            <a class="btn btn-sm btn-success" style="
+                            float:right; margin-right:20%"  href="/update-pacient/{{ pacient.id }}" > Update Personal info </a>
+                        {% endif %}
                         </p>
 
                     </div><!--/login form-->
 				</div>
 
 
-    <div class="container">
-            <div class="table-responsive cart_info">
-					 <a class="btn btn-fefault cart" href="{% url 'createProduct' %}">Sell An Item</a>
-                     <a class="btn btn-fefault cart" href="{% url "productsManagement" %}" ><i class="fa fa-cog"></i>  My Products </a>
-                     <a class="btn btn-fefault cart" href="{% url "soldManagement" %}" ><i class="fa fa-cog"></i>  Products Sold </a>
-                <hr>
-                    <h2>History</h2>
-
-            </div>
-    </div>
-    {% for scis, payment in carts %}
-        <section id="cart_items">
-
-		<div class="container">
-            <div class="table-responsive cart_info">
-				<table class="table table-condensed">
-					<thead>
-						<tr class="cart_menu">
-							<td class="image">Item</td>
-							<td class="description">Product</td>
-							<td class="description">Description</td>
-
-							<td class="quantity">Quantity</td>
-							<td class="price">Price</td>
-							<td></td>
-						</tr>
-					</thead>
-					<tbody>
-
-                            {% for sci in scis %}
-                                <tr>
-							<td class="col-sm-3 cart_product">
-								<a href=""><img style="width: 200px" src="{{ sci.product.image.url }}" alt=""></a>
-							</td>
-
-							<td class="col-sm-4 cart_description">
-								<h4><a href="">{{ sci.product.name }}</a></h4>
-								<p>Web ID: {{ sci.product.id }}</p>
-							</td>
-							<td class="col-sm-2 cart_price" style="max-width:300px">
-								<p>{{ sci.product.description }}</p>
-							</td>
-							<td class="cart_quantity">
-								<div class="cart_quantity_button">
-									<input class="cart_quantity_input" type="text" name="quantity" value="{{ sci.quantity }}" autocomplete="off" size="2"/>
-								</div>
-							</td>
-							<td class="cart_total">
-								<p class="cart_total_price">{{ sci.product.price }}€</p>
-							</td>
-
-
-						</tr>
-
-                            {% endfor %}
-                          <tr>
-                              <td class="description"><p></p></td>
-                              <td class="description">Date: <h4>{{ payment.date }}</h4></td>
-                              <td class="description">Address: <h4>{{ payment.address }}</h4></td>
-                              <td class="price">Total: <h4>{{ payment.total }}</h4></td>
-                              <td class="price">Credits: <h4>-{{ payment.usedCredits }}</h4></td>
-
-                          </tr>
-
-
-
-					</tbody>
-				</table>
-			</div>
-		</div>
-        </section>
-    {%  endfor %}
+    
+    </section>
 {% endblock %}
 

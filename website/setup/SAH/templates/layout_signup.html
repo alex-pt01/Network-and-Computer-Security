@@ -16,7 +16,6 @@
     <link href="{% static "css/animate.css" %}" rel="stylesheet">
     <link href="{% static "css/main.css" %}" rel="stylesheet">
     <link href="{% static "css/responsive.css" %}" rel="stylesheet">
-    
 
     <!--[if lt IE 9]>
     <script  src="{% static 'js/html5shiv.js' %}" ></script>
@@ -41,16 +40,10 @@
 					<div class="col-md-12 clearfix">
 						<div class="shop-menu clearfix pull-right">
 							<ul style="float:right" class="nav navbar-nav">
-								
 
 
-                                {% if user.is_authenticated %}
-								    <li><a style="background-color: #2a6496; color: white"  href="" > Welcome, {{ user.get_username }}</a></li>
-                                    <li><a style="background-color: #2a6496; color: white" href="{% url 'account' %}"><i class="fa fa-user"></i> Account</a></li>
-                                    <li ><a style="background-color: #2a6496; color:white"  href="{% url "logout" %}"><i class="icon-signout"></i>Logout </a></li>
-                                {% else %}
 								    <li><a style="background-color: #2a6496; color:white" href="{% url 'login' %}" ><i class="fa fa-sign-in" aria-hidden="true"></i>Login</a></li>
-                                {%  endif %}
+                        
 							</ul>
 						</div>
 					</div>
@@ -58,36 +51,6 @@
 			</div>
 		</div><!--/header-middle-->
 
-
-            <div class="header-bottom">
-                <div class="container " >
-                    <div class="row">
-                        <div class="col-sm-12">
-    
-                            <div class="mainmenu  col-sm-12  pull-left" >
-                                <ul style="float:left" class="nav navbar-nav collapse navbar-collapse">
-                                    {% if user.is_authenticated and user.is_superuser %}
-
-                                    <li><a href="{% url "home" %}" >Home</a></li>
-                                    <li><a href="{% url "consults-management" %}" >Consults Management</a></li>
-                                    <li><a href="{% url "room-consult-management" %}" >Room Reservation</a></li>
-
-                                    <li><a href="{% url "users-management" %}" >User Management</a></li>
-                                    {%  else %}
-                                    <li><a href="{% url "home" %}" >Consults</a></li>
-
-                                    {%  endif %}
-
-    
-                                    
-    
-                                </ul>
-                            </div>
-                        </div>
-    
-                    </div>
-                    </div>
-                </div>
 	</header>
 
 
@@ -95,8 +58,8 @@
 
             {% block content %}
 
-            {% endblock %}
 
+            {% endblock %}
 
     <!-- Plugin JavaScript -->
     <script src="{% static 'js/jquery.js' %}" ></script>
