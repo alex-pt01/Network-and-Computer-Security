@@ -31,10 +31,10 @@
 
                         {% if user_type == 'D' %}
                         <a class="btn btn-sm btn-success" style="
-                        float:right; margin-right:20%"  href="update-doctor/{{ doctor.id }}" > Update Personal info </a>
+                        float:right; margin-right:20%"  href="{% url 'update-doctor' doctor.id %}" > Update Personal info </a>
                         {% else %}
                             <a class="btn btn-sm btn-success" style="
-                            float:right; margin-right:20%"  href="/update-pacient/{{ pacient.id }}" > Update Personal info </a>
+                            float:right; margin-right:20%"  href="{% url 'update-pacient' pacient.id %}" > Update Personal info </a>
                         {% endif %}
                         </p>
 

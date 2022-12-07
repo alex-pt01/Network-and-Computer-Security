@@ -1,43 +1,64 @@
-# SIRS
+ADMIN
+username: adminsirs
+
+password: @adsirs123
+
+DOCTOR
+username:  doctor & doctor1 & doctor2
+
+password: @sirs1234
+
+PACIENT
+username: pacient & pacient1 & pacient2
+
+password: @sirs1234
 
 
-python3 -m venv django_env
+source ~/.bash_profile
 
-source django_env/bin/activate
-
-python -m pip install django
-
-python -m pip install django-allauth
-
-pip3 install django-debug-toolbar
-
-pip install django-createsuperuser
-
-python manage.py createsuperuser
-
-pip3 install django-multi-form-view
-
----------
+conda activate django
 
 python3 manage.py makemigrations
 
 python3 manage.py migrate
 
-python3 manage.py rumserver
+python3 manage.py runserver
 
------
-ADMIN
-
-username: sirs
-
-password: as@123
-
-USER
-
-username: usertest
-
-password: @luso123
-
----
-Kill port:
 npx kill-port 8000
+
+
+
+
+conda create --name django
+
+python3 -m pip install django
+
+python3 -m pip install django-allauth
+
+pip3 install django-debug-toolbar
+
+pip install django-createsuperuser
+
+python3 manage.py createsuperuser
+
+pip3 install django-multi-form-view
+
+1. Remove all the migration files
+
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+
+find . -path "*/migrations/*.pyc"  -delete
+2. Delete db.sqlite3
+
+rm db.sqlite3
+3. Create and run the migrations:
+
+python manage.py makemigrations
+python manage.py migrate
+4. Sync the database:
+
+manage.py migrate --run-syncdb
+
+
+
+

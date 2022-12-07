@@ -29,18 +29,20 @@
 
 	<header ><!--header-->
 
-		<div style="background-color: #2a6496" ><!--header-middle-->
-			<div class="container">
+		<div style="height: 300px; background-color: #2a6496;" ><!--header-middle-->
+            <img src="../static/images/img-1.png" style=" background-repeat: no-repeat; position: absolute; height: 250px; width: auto; filter: brightness(10) invert(1); margin-top:20px; margin-left: 75%;" >
+
+            <div class="container">
 				<div class="row">
 					<div class="col-md-8 clearfix">
-						<div class="logo pull-left"  style="margin-top: 60px">
-                            <a href="{% url "home" %}" > <span style="color: darkorange; font-size: 40px; font-style: italic"   >Saint Acutis </span></a><span style="color: whitesmoke; font-size: 40px;"   >hospital</span></a>
+						<div class="logo pull-left"  style="margin-top: 95px">
+                            <a href="{% url "home" %}" > <span style="color: darkorange; font-size: 55px; font-style: italic"   >Saint Acutis </span></a><span style="color: whitesmoke; font-size: 45px;"   >hospital</span></a>
 						</div>
 					</div>
 
-					<div class="col-md-12 clearfix">
+					<div class="col-md-12 clearfix" style="margin-top: 90px;">
 						<div class="shop-menu clearfix pull-right">
-							<ul style="float:right" class="nav navbar-nav">
+							<ul style="float:right" class="nav navbar-nav" >
 								
 
 
@@ -73,8 +75,13 @@
                                     <li><a href="{% url "room-consult-management" %}" >Room Reservation</a></li>
 
                                     <li><a href="{% url "users-management" %}" >User Management</a></li>
+                                    {%  elif user.is_authenticated %}
+                                    <li><a href="{% url "home" %}" >Home</a></li>
+
+                                    <li><a href="{% url "consults" %}" >Consults</a></li>
                                     {%  else %}
-                                    <li><a href="{% url "home" %}" >Consults</a></li>
+                                    <li><a href="{% url "home" %}" >Home</a></li>
+                                    <li><a href="{% url "consults" %}" >Consults</a></li>
 
                                     {%  endif %}
 
@@ -109,7 +116,7 @@
             <script>
 
         $(function() {
-        setTimeout(function() { $("#hideDiv").fadeOut(1500); }, 1000)
+        setTimeout(function() { $("#hideDiv").fadeOut(2500); }, 1000)
 
         })
     </script>

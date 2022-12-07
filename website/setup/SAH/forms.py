@@ -23,7 +23,7 @@ class updateUserForm(forms.Form):
 
 class DoctorForm(forms.Form):
     name = forms.CharField(label="Name", max_length=150, required=True)
-    specialization = forms.ChoiceField(choices=(('Orthopedy','Orthopedy'), ('Cardiology','Cardiology'),('Dermatology','Dermatology')))
+    specialization = forms.ChoiceField(choices=[(x.id, x.name) for x in Specialization.objects.all()])
     gender = forms.ChoiceField(choices=(('Female','Female'), ('Male','Male'),('Other','Other')),required=True)
     address = forms.CharField(label="Address", max_length=400, required=True)
     phone_number = forms.IntegerField(label="Phone number", help_text='Must have 9 numbers', required=True)
@@ -40,12 +40,27 @@ class PacientForm(forms.Form):
     id_card = forms.IntegerField(label="ID Card", help_text='Must have 9 numbers', required=True)
 
 
-class ConsultForm(forms.Form):
-    consult_date = forms.DateTimeField(label="Consult date", help_text='Required. Format: YYYY-MM-DD', required=True)
-    pacient = forms.ChoiceField(choices=[(x.id, str(x.name) +  " --- ID CARD: " +  str(x.id_card)) for x in Pacient.objects.all()])
-    doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + str(x.specialization) + "--- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
+class DateTimePickerInput(forms.DateTimeInput):
+        input_type = 'datetime'
 
-    description = forms.CharField(label="Sescription", max_length=450, required=True)
+class DateTimeLocalInput(forms.DateTimeInput):
+    input_type = "datetime-local"
+ 
+class DateTimeLocalField(forms.DateTimeField):
+    input_formats = [
+        "%Y-%m-%dT%H:%M:%S", 
+        "%Y-%m-%dT%H:%M:%S.%f", 
+        "%Y-%m-%dT%H:%M"
+    ]
+    widget = DateTimeLocalInput(format="%Y-%m-%dT%H:%M")
+
+
+class ConsultForm(forms.Form):
+    consult_date  = DateTimeLocalField()
+    pacient = forms.ChoiceField(choices=[(x.id, str(x.name) +  " --- ID CARD: " +  str(x.id_card)) for x in Pacient.objects.all()])
+    doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
+    status = forms.ChoiceField( choices=(('Waiting','Waiting'),('In Progress','In Progress'), ('Done','Done')))
+    description = forms.CharField(label="Description", max_length=450, required=True)
 
 class ConsultRoomReservationForm(forms.Form):
     room = forms.ChoiceField(choices=[(x.id, "Number: " + str(x.number) + " --- Floor: " + str(x.floor) ) for x in Room.objects.all()], required=True)

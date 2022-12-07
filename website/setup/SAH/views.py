@@ -9,6 +9,7 @@ from SAH.models import *
 
 from django.http import HttpRequest, HttpResponseRedirect
 from time import strptime
+from datetime import datetime
 
 def login(request):
     if request.user.is_authenticated:
@@ -109,7 +110,7 @@ def doctor_signup(request):
             form = DoctorForm(request.POST, request.FILES)
             if form.is_valid():
                 doct = Doctor(user = User.objects.all().last(),
-                specialization = Specialization.objects.get(name=form.cleaned_data['specialization']),
+                specialization = Specialization.objects.get(id= form.cleaned_data['specialization']),
                 gender= form.cleaned_data['gender'],
                 name = form.cleaned_data['name'], 
                 address = form.cleaned_data['address'],
@@ -157,10 +158,12 @@ def logout(request):
     return redirect('home')
 
 def home(request):
+    return render(request, 'home.html', {"form": "forms"})
+
+def consults(request):
     consults = None
     user_type = None
     if request.user.is_authenticated:
-
         if request.user.is_superuser:
             print("HOSPITAL")
             consults = Consult.objects.all()
@@ -175,13 +178,41 @@ def home(request):
             doctor = Doctor.objects.get(user__id= request.user.id)
             consults = Consult.objects.filter(doctor=doctor)
             user_type = 'D'
-    return render(request, 'home.html', {'consults': consults, 'user_type': user_type})
+        return render(request, 'consults.html', {'consults': consults, 'user_type': user_type})
+    return redirect('login')
+
+def consult_reservation(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = ConsultForm(request.POST, request.FILES)
+            if form.is_valid():
+                consult = Consult()
+                consult.scheduled_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print("OK", datetime.now())
+                consult.consult_date = form.cleaned_data['consult_date']
+                print("OK1" ,form.cleaned_data['consult_date'] )
+
+                consult.pacient = Pacient.objects.get(user__id= request.user.id)
+                print("OK2")
+
+                consult.doctor = Doctor.objects.get(id=form.cleaned_data['doctor'])
+                print("OK3")
+
+                consult.description = form.cleaned_data['description']
+                print("OK4")
+
+                consult.status = "Waiting"
+                consult.save()
+                return redirect('consults')
+            else:
+                print(form.errors)
+        else:
+            form = ConsultForm()
+        return render(request, 'consult-reservation.html', {'form': form})
+    return redirect('login')
 
 
 
-
-
-#TODO
 def account(request):
     if request.user.is_authenticated:
         if Pacient.objects.filter(user_id=request.user.id).exists():
@@ -189,29 +220,27 @@ def account(request):
             return render(request, 'account.html', {"user_type":"P","pacient": Pacient.objects.get(user_id=request.user.id)})
         elif Doctor.objects.filter(user_id=request.user.id).exists():
             print("DOCTOR")
-            doctor = Doctor.objects.filter(user_id=request.user.id)
+            doctor = Doctor.objects.get(user_id=request.user.id)
             return render(request, 'account.html', {"user_type": "D", "doctor" : doctor})
         else:
             if request.user.is_superuser:
-                print("DOCTOR")
-                doctor = Doctor.objects.filter(user_id=request.user.id)
-                return render(request, 'account.html', {"user_type": "D", "doctor" : doctor})
-
-
-
+                return redirect('account')
     return redirect('login')
 
 
-#TODO
+#TODO -> instance
 def update_doctor(request, doctor_id):
-    assert isinstance(request, HttpRequest)
+
     if request.user.is_authenticated:
+        doctor = Doctor.objects.get(id=doctor_id)
+
         if request.method == 'POST':
             form = DoctorForm(request.POST)
             if form.is_valid():
-                doctor = Doctor.objects.get(id=doctor_id)
-                doctor.user = request.user,
-                doctor.specialization = form.cleaned_data["specialization"],
+                #doctor.user = request.user,
+                print("$$$$$$$$$$$$$ ",Specialization.objects.get(id=form.cleaned_data['specialization']) )
+
+                doctor.specialization = Specialization.objects.get(id=form.cleaned_data['specialization']),
                 doctor.gender= form.cleaned_data['gender'],
                 doctor.name = form.cleaned_data['name'], 
                 doctor.address = form.cleaned_data['address'],
@@ -220,49 +249,50 @@ def update_doctor(request, doctor_id):
                 doctor.id_card = form.cleaned_data['id_card']
                 doctor.save()
                 return redirect("home")
-            else:
-                doctor = Doctor.objects.get(id=doctor_id)
-                form = DoctorForm(initial={"specialization": doctor.specialization.name,
-                                            "gender": doctor.gender,
-                                            "name": doctor.name,
-                                            "address": doctor.address,
-                                            "phone_number": doctor.phone_number,
-                                            "birth_date": doctor.birth_date,
-                                            "id_card": doctor.id_card,
-                                            })
+        else:
+            form = DoctorForm(initial={
+                    "specialization": doctor.specialization,
+                                        "gender": doctor.gender,
+                                        "name": doctor.name,
+                                        "address": doctor.address,
+                                        "phone_number": doctor.phone_number,
+                                        "birth_date": doctor.birth_date,
+                                        "id_card": doctor.id_card,
+                                        })
                                         
-            return render(request, "update-doctor.html", {"form": form})
+        return render(request, "update-doctor.html", {"form": form})
 
-#TODO
+#TODO -> mete virgula
 def update_pacient(request, pacient_id):
-    assert isinstance(request, HttpRequest)
     if request.user.is_authenticated:
+        pacient = Pacient.objects.get(id=pacient_id)
+
         if request.method == 'POST':
             form = PacientForm(request.POST)
             if form.is_valid():
-                pacient = Pacient.objects.get(id=pacient_id)
-                pacient.user = request.user,
+                #pacient.user = request.user,
                 pacient.name = form.cleaned_data['name'], 
                 pacient.gender= form.cleaned_data['gender'],
                 
                 pacient.address = form.cleaned_data['address'],
-                pacient.phone_number = form.cleaned_data['phone_number'],
+                print(form.cleaned_data['phone_number']),
+                pacient.phone_number = str(form.cleaned_data['phone_number'])[0:-1],
                 pacient.birth_date = form.cleaned_data['birth_date'],
                 pacient.save()
                 return redirect("home")
-            else:
-                pacient = Pacient.objects.get(id=pacient_id)
-                form = PacientForm(initial={ "name": pacient.name,
-                                            "gender": pacient.gender,
-                                            "address": pacient.address,
-                                            "phone_number": pacient.phone_number,
-                                            "birth_date": pacient.birth_date,
-                                            "id_card": pacient.id_card,
-                                            })
+        else:
+            form = PacientForm(initial={ "name": pacient.name,
+                                        "gender": pacient.gender,
+                                        "address": pacient.address,
+                                        "phone_number": pacient.phone_number,
+                                        "birth_date": pacient.birth_date,
+                                        "id_card": pacient.id_card,
+                                        })
                                         
-            return render(request, "update-pacient.html", {"form": form})
+        return render(request, "update-pacient.html", {"form": form})
 
 
+    
 #HOSPITAL --------------------------------------------------------------------------------
 def consults_management(request):
     if request.user.is_authenticated and request.user.is_superuser:
@@ -276,10 +306,16 @@ def create_consult(request):
     if request.user.is_authenticated and request.user.is_superuser:
         if request.method == 'POST':
             form = ConsultForm(request.POST, request.FILES)
+            print("DDD ", form['consult_date'])
+
+            print("OKKKK")
             if form.is_valid():
+                print("OKKKK")
+
                 consult = Consult()
                 consult.scheduled_date = datetime.now()
                 consult.consult_date = form.cleaned_data['consult_date']
+                print("XXXXXX --- ", form.cleaned_data['consult_date'])
                 consult.pacient = Pacient.objects.get(id=form.cleaned_data['pacient'])
                 consult.doctor = Doctor.objects.get(id=form.cleaned_data['doctor'])
                 consult.description = form.cleaned_data['description']
@@ -322,7 +358,6 @@ def update_consult(request,id):
                                       "pacient": consult.pacient,
                                       "doctor": consult.doctor,
                                       "status":consult.status,
-
                                       "description":consult.description
                                       })
     return render(request, "update-consult.html", {"form": form})

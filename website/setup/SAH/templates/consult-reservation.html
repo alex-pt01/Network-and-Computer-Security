@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 	<section ><!--form-->
-    <div class="row">       
+    <div class="row">
 				<div class="col-sm-4 col-sm-offset-4" >
 
 					<div class="login-form"><!--login form-->
@@ -12,18 +12,13 @@
                             <label>Consult date:</label>
                             {{ form.consult_date }}
 
-                            
-                            <label>Pacient:</label>
-                            {{ form.pacient }}
+                                                                                        
                             <br>
                             <label>Doctor:</label>
                             {{ form.doctor }}
                             <br>
-                            <label>Status:</label>
-                            {{ form.status }}
-                            <br>
                             <label>Description:</label>
-                            {{ form.description }}
+                            {{ form.as_p}}
                             <button style="float:right;" type="submit" class="btn btn-default">Create Consult</button>
 						</form>
 					</div><!--/login form-->

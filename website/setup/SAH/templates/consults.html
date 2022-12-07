@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <style>
+        .styled-table {
+            border-collapse: collapse;
+            width:76%;
+            margin-left:12%;
+            margin-right:12%;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+        }
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #009879;
+            text-align: left;
+        }
+
+            .styled-table th,
+             .styled-table td {
+                padding: 30px 15px;
+                }
+
+
+            .styled-table tbody tr:nth-of-type(even) {
+                background-color: #f3f3f3;
+            }
+
+            .styled-table tbody tr:last-of-type {
+                border-bottom: 2px  #009879;
+            }
+
+            .styled-table tbody tr.active-row {
+                color: #009879;
+            }
+    </style>
+    <!--PRODUCTS MANAGEMENT-->
+      
+
+
+
+	<section style="width: 100%; height:auto"><!--form-->
+        <p>
+            <a class="btn btn-sm btn-success" style="
+             float:right;margin-right:180px"  href="{% url 'consult-reservation' %}" > Create Consult </a>
+         </p>
+        <div   >
+                <div   >
+
+                <table class="styled-table">
+                <tr>
+                    <th>To</th>
+                    <th>From</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th style="color:#2a6496">Doctor name</th>
+                    <th style="color:#2a6496">Doctor specialization</th>
+                    <th style="color:#2a6496">Doctor ID card</th>
+                    <th style="color:#2a6496">Doctor + info</th>
+                    <th>Remove</th>
+           
+                </tr>
+                {% for consult in consults %}
+                    <tr>
+                        <th>{{ consult.consult_date }}</th>
+                        <th>{{ consult.scheduled_date }}</th>
+                        <th>{{ consult.description }}</th>
+                        <th>{{ consult.status }}</th>
+
+                        <th style="color:#2a6496">{{ consult.doctor.name }}</th>
+                        <th style="color:#2a6496">{{ consult.doctor.specialization }}</th>
+                        <th style="color:#2a6496">{{ consult.doctor.id_card }}</th>
+
+                        <th><a class="btn btn-sm btn-secondary" href="{% url 'doctor-info' consult.doctor.id %}">Info</a></th>
+                        <th><a class="btn btn-sm btn-danger" href="{% url 'deleteConsult' consult.id %}">Delete</a></th>
+
+                    </tr>
+                {%  endfor %}
+                </table>
+        </div>
+    </div>
+	</section>
+
+
+
+{% endblock %}
+

@@ -39,11 +39,12 @@ class Doctor(models.Model):
 
 
 class Consult(models.Model):
+    scheduled_date = models.DateTimeField(default=datetime.now, null=True)
+    consult_date = models.DateTimeField( blank=True, null=True)
+
     pacient = models.ForeignKey(Pacient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    scheduled_date = models.DateTimeField(default=datetime.now)
-    consult_date = models.DateTimeField( blank=True, null=True)
-    status = models.CharField(max_length=150, choices=(('Waiting','Waiting'),('In Progress','In Progress'), ('Done','Done')))
+    status = models.CharField(choices=(('Waiting','Waiting'),('In Progress','In Progress'), ('Done','Done')), max_length=200)
 
     description = models.CharField(max_length=150)
     def __str__(self):

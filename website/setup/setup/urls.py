@@ -23,6 +23,8 @@ urlpatterns = [
     path('update-doctor/<str:doctor_id>/', views.update_doctor, name='update-doctor'),
     path('update-pacient/<str:pacient_id>/', views.update_pacient, name='update-pacient'),
 
+    path('consults/', views.consults, name='consults'),
+    path('consult-reservation/', views.consult_reservation, name='consult-reservation'),
 
     #HOSPITAL
     path('consults-management/', views.consults_management, name='consults-management'),
