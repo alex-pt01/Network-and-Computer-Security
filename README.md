@@ -1,5 +1,5 @@
 **SAH**
-
+```
 ADMIN
 username: adminsirs
 password: @adsirs123
@@ -11,10 +11,10 @@ password: @sirs1234
 PACIENT
 username: pacient 
 password: @sirs1234
+```
 
 **START working**
 ```
-
 source ~/.bash_profile
 conda activate django
 
@@ -37,6 +37,7 @@ pip3 install django-createsuperuser
 
 
 **HELP**
+```
 1. Remove all the migration files
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 find . -path "*/migrations/*.pyc"  -delete
@@ -47,9 +48,10 @@ rm db.sqlite3
 3. Create and run the migrations:
 python manage.py makemigrations
 python manage.py migrate
-4. Sync the database:
 
+4. Sync the database:
 manage.py migrate --run-syncdb
+```
 
 
 
