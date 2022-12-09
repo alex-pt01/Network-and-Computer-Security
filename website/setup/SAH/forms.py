@@ -59,9 +59,19 @@ class ConsultForm(forms.Form):
     consult_date  = DateTimeLocalField()
     pacient = forms.ChoiceField(choices=[(x.id, str(x.name) +  " --- ID CARD: " +  str(x.id_card)) for x in Pacient.objects.all()])
     doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
-    status = forms.ChoiceField( choices=(('Waiting','Waiting'),('In Progress','In Progress'), ('Done','Done')))
+    status = forms.ChoiceField( choices=(('WAITING','WAITING'),('ACCEPT','ACCEPT'), ('DONE','DONE')))
     description = forms.CharField(label="Description", max_length=450, required=True)
+
+class ConsultPacientForm(forms.Form):
+    consult_date  = DateTimeLocalField()
+    doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
+    description = forms.CharField(label="Description", max_length=450, required=True)
+
 
 class ConsultRoomReservationForm(forms.Form):
     room = forms.ChoiceField(choices=[(x.id, "Number: " + str(x.number) + " --- Floor: " + str(x.floor) ) for x in Room.objects.all()], required=True)
-    consult = forms.ChoiceField(choices=[(x.id, "Consult Date: " + str(x.consult_date) + " --- Doctor name: " + str(x.doctor.name) + " --- ID CARD: " + str(x.doctor.id_card) + " --- Pacient name: " + str(x.pacient.name) + "--- ID CARD: " + str(x.pacient.id_card)) for x in Consult.objects.all()], required=True)
+    consult = forms.ChoiceField(choices=[(x.id, "Consult Date: " + str(x.consult_date) + " Status: " + str(x.status) + " --- Doctor name: " + str(x.doctor.name) + " --- ID CARD: " + str(x.doctor.id_card) + " --- Pacient name: " + str(x.pacient.name) + "--- ID CARD: " + str(x.pacient.id_card)) for x in Consult.objects.all()], required=True)
+
+class RoomForm(forms.Form):
+    number = forms.IntegerField(label="Number",required=True)
+    floor = forms.IntegerField(label="Floor", required=True)

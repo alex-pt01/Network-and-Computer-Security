@@ -1,24 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
 	<section ><!--form-->
-    <div class="row">
+    <div class="row">       
 				<div class="col-sm-4 col-sm-offset-4" >
 
 					<div class="login-form"><!--login form-->
-						<h2>Create new consult</h2>
+						<h2>Update room</h2>
 					    <form method="POST" action="." enctype= multipart/form-data>
 						    {% csrf_token %}
 
-                            <label>Consult date:</label>
-                            {{ form.consult_date }}
-                            <br>
-                            <label>Doctor:</label>
-                            {{ form.doctor }}
+                            {{ form.as_p }}
+
+                                     
                         
-                            <br>
-                            <label>Description:</label>
-                            {{ form.description }}
-                            <button style="float:right;" type="submit" class="btn btn-default">Create Consult</button>
+                            <button style="float:right;" type="submit" class="btn btn-default">Update</button>
 						</form>
 					</div><!--/login form-->
 				</div>

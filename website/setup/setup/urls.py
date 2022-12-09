@@ -26,11 +26,17 @@ urlpatterns = [
     path('consults/', views.consults, name='consults'),
     path('consult-reservation/', views.consult_reservation, name='consult-reservation'),
 
+
     #HOSPITAL
     path('consults-management/', views.consults_management, name='consults-management'),
     path('create-consult/', views.create_consult, name='create-consult'),
     path('deleteConsult/<str:id>', views.deleteConsult, name='deleteConsult'),
     path('update-consult/<str:id>/', views.update_consult, name='update-consult'),
+
+    path('rooms-management/', views.rooms_management, name='rooms-management'),
+    path('deleteRoom/<str:id>', views.deleteRoom, name='deleteRoom'),
+    path('update-room/<str:id>/', views.update_room, name='update-room'),
+    path('create-room/', views.create_room, name='create-room'),
 
     path('users-management/', views.users_management, name='users-management'),
     path('deletePacient/<str:id>', views.deletePacient, name='deletePacient'),

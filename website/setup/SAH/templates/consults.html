@@ -42,8 +42,11 @@
 
 	<section style="width: 100%; height:auto"><!--form-->
         <p>
+            {% if user.is_authenticated and user_type == 'P' %}
             <a class="btn btn-sm btn-success" style="
              float:right;margin-right:180px"  href="{% url 'consult-reservation' %}" > Create Consult </a>
+            {%  endif %}
+
          </p>
         <div   >
                 <div   >
@@ -54,6 +57,9 @@
                     <th>From</th>
                     <th>Description</th>
                     <th>Status</th>
+                    <th style="color:orange">Pacient name</th>
+                    <th style="color:orange">Pacient id_card</th>
+
                     <th style="color:#2a6496">Doctor name</th>
                     <th style="color:#2a6496">Doctor specialization</th>
                     <th style="color:#2a6496">Doctor ID card</th>
@@ -66,8 +72,11 @@
                         <th>{{ consult.consult_date }}</th>
                         <th>{{ consult.scheduled_date }}</th>
                         <th>{{ consult.description }}</th>
-                        <th>{{ consult.status }}</th>
 
+                        
+                        <th>{{ consult.status }}</th>
+                        <th style="color:orange">{{ consult.pacient.name }}</th>
+                        <th style="color:orange">{{ consult.pacient.id_card }}</th>
                         <th style="color:#2a6496">{{ consult.doctor.name }}</th>
                         <th style="color:#2a6496">{{ consult.doctor.specialization }}</th>
                         <th style="color:#2a6496">{{ consult.doctor.id_card }}</th>

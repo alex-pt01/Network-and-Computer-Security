@@ -44,11 +44,11 @@ class Consult(models.Model):
 
     pacient = models.ForeignKey(Pacient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    status = models.CharField(choices=(('Waiting','Waiting'),('In Progress','In Progress'), ('Done','Done')), max_length=200)
+    status = models.CharField(choices=(('WAITING','WAITING'),('ACCEPT','ACCEPT'), ('DONE','DONE')), max_length=200)
 
     description = models.CharField(max_length=150)
     def __str__(self):
-        return "Consult Date: " + str(self.consult_date) + " --- Doctor:    " + self.doctor.name + " --- Pacient: " + self.pacient.name
+        return "Consult Date: " + str(self.consult_date) +  " --- Status: " + str(self.status) + " --- Doctor:    " + self.doctor.name + " --- Pacient: " + self.pacient.name
 
 class Room(models.Model):
     number = models.IntegerField( blank=True, null=True)
