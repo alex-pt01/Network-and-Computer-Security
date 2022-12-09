@@ -13,6 +13,8 @@ username: pacient
 password: @sirs1234
 
 **START working**
+```
+
 source ~/.bash_profile
 conda activate django
 
@@ -20,15 +22,18 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py runserver
 npx kill-port 8000
+```
 
 
 
 **Requirements**
+```
 conda create --name django
 python3 -m pip install django
 python3 -m pip install django-allauth
 pip3 install django-debug-toolbar
 pip3 install django-createsuperuser
+```
 
 
 **HELP**
