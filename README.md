@@ -15,18 +15,6 @@ username: pacient
 password: @sirs1234
 ```
 
-**START working**
-```
-source ~/.bash_profile
-conda activate django
-
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 manage.py runserver
-npx kill-port 8000
-```
-
-
 
 **Requirements**
 ```
@@ -38,6 +26,38 @@ python3 -m pip install django-allauth
 pip3 install django-sslserver
 pip3 install django-debug-toolbar
 pip3 install django-createsuperuser
+```
+
+**START working**
+```
+source ~/.bash_profile
+conda activate django
+
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py runserver
+npx kill-port 8000
+```
+
+```
+** BD Django -> mysql workbench **
+ 
+sudo snap install mysql-workbench-community
+sudo apt-get install gnome-keyring
+sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
+sudo mysql
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_new_password';
+
+pip install wheel
+pip install pymysql
+
+Dentro do django:
+file init na pasta settings
+
+import pymysql
+
+pymysql.install_as_MySQLdb(
 ```
 
 
