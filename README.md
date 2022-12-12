@@ -31,7 +31,8 @@ npx kill-port 8000
 **Requirements**
 ```
 Instalar Anaconda : https://linuxhint.com/install-anaconda-ubuntu-22-04/
-conda create --name django
+virtualenv django
+source django/bin/activate
 python3 -m pip install django
 python3 -m pip install django-allauth
 pip3 install django-debug-toolbar
