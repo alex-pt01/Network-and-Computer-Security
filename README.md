@@ -52,10 +52,9 @@ pip install wheel
 pip install pymysql
 
 Dentro do django:
-file init na pasta settings
+no file init na pasta settings meter
 
 import pymysql
-
 pymysql.install_as_MySQLdb(
 ```
 
