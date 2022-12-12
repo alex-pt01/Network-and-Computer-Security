@@ -40,7 +40,7 @@ npx kill-port 8000
 ```
 
 ```
-** BD Django -> mysql workbench **
+**BD Django -> mysql workbench**
  
 sudo snap install mysql-workbench-community
 sudo apt-get install gnome-keyring
