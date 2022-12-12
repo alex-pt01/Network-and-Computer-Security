@@ -20,7 +20,7 @@ ALLOWED_HOSTS += ['192.168.1.{}'.format(i) for i in range(256) ]
 # Application definition
 
 INSTALLED_APPS = [
-    
+    'sslserver',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
