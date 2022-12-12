@@ -35,6 +35,7 @@ virtualenv django
 source django/bin/activate
 python3 -m pip install django
 python3 -m pip install django-allauth
+pip3 install django-sslserver
 pip3 install django-debug-toolbar
 pip3 install django-createsuperuser
 ```
