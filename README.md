@@ -39,9 +39,8 @@ python3 manage.py runserver
 npx kill-port 8000
 ```
 
-```
 **BD Django -> mysql workbench**
- 
+```
 sudo snap install mysql-workbench-community
 sudo apt-get install gnome-keyring
 sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
