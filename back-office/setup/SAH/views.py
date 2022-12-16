@@ -362,3 +362,36 @@ def doctor_info(request, id):
         doctor = Doctor.objects.get(id=id)
         return render(request, "doctor-info.html", {"doctor": doctor})    
     return redirect('login')
+
+
+def external_lab_info(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        externalLabs = ExternalLabs.objects.all()
+        return render(request, "external-lab-info.html", {"externalLabs": externalLabs})    
+    return redirect('login')
+
+def create_external_lab_info(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        if request.method == 'POST':
+            form = ExternalLabsForm(request.POST, request.FILES)
+            if form.is_valid():
+                externalLabs = ExternalLabs()
+                externalLabs.pacient = Pacient.objects.get(id=form.cleaned_data['pacient'])
+                externalLabs.doctor = Doctor.objects.get(id=form.cleaned_data['doctor'])
+                externalLabs.lab_name = form.cleaned_data['lab_name']
+                externalLabs.consult_lab_date = form.cleaned_data['consult_lab_date']
+                externalLabs.form_update_date = datetime.now()
+                externalLabs.intro = form.cleaned_data['intro']
+                externalLabs.materials = form.cleaned_data['materials']
+                externalLabs.procedure = form.cleaned_data['procedure']
+                externalLabs.results = form.cleaned_data['results']
+                externalLabs.hash = form.cleaned_data['hash']
+                externalLabs.save()
+
+                return redirect('external-lab-info')
+            else:
+                print(form.errors)
+        else:
+            form = ExternalLabsForm()
+        return render(request, 'create-external-lab-info.html', {'form': form})
+    return redirect('login')

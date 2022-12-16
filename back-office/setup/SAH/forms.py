@@ -68,3 +68,14 @@ class ConsultRoomReservationForm(forms.Form):
 class RoomForm(forms.Form):
     number = forms.IntegerField(label="Number",required=True)
     floor = forms.IntegerField(label="Floor", required=True)
+
+class ExternalLabsForm(forms.Form):
+    pacient = forms.ChoiceField(choices=[(x.id, str(x.name) +  " --- ID CARD: " +  str(x.id_card)) for x in Pacient.objects.all()])
+    doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
+    lab_name = forms.CharField(label="Lab name", max_length=200, required=True)
+    consult_lab_date  = DateTimeLocalField()
+    intro = forms.CharField(label="Intro", max_length=400, required=True)
+    materials = forms.CharField(label="Materials", max_length=400, required=True)
+    procedure = forms.CharField(label="Procedure", max_length=400, required=True)
+    results = forms.CharField(label="Results", max_length=400, required=True)
+    hash = forms.CharField(label="Hash value", max_length=2000, required=True)

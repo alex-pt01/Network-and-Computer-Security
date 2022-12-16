@@ -46,6 +46,8 @@ urlpatterns = [
     path('doctor-info/<str:id>/', views.doctor_info, name='doctor-info'),
     path('pacient-info/<str:id>/', views.pacient_info, name='pacient-info'),
 
+    path('external-lab-info/', views.external_lab_info, name='external-lab-info'),
+    path('create-external-lab-info/', views.create_external_lab_info, name='create-external-lab-info'),
 
 
 ]

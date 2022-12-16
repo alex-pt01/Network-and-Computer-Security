@@ -62,5 +62,21 @@ class ConsultRoomReservation(models.Model):
     def __str__(self):
         return self.consult.doctor.specialization.name
 
+
+class ExternalLabs(models.Model):
+    pacient = models.ForeignKey(Pacient, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    lab_name = models.CharField(max_length=200)
+    consult_lab_date  = models.DateTimeField( blank=True, null=True)
+    form_update_date = models.DateTimeField(default=datetime.now, null=True)
+    intro = models.CharField(max_length=400)
+    materials = models.CharField(max_length=400)
+    procedure = models.CharField(max_length=400)
+    results = models.CharField(max_length=400)
+    hash = models.CharField(max_length=2000)
+    def __str__(self):
+        return self.lab_name
+
+
 class Meta:
     app_label  = 'SAH'
