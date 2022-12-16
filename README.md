@@ -18,7 +18,6 @@ password: @sirs1234
 
 **Requirements**
 ```
-Instalar Anaconda : https://linuxhint.com/install-anaconda-ubuntu-22-04/
 virtualenv django
 source django/bin/activate
 python3 -m pip install django
