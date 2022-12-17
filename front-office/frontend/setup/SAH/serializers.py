@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.validators import ValidationError
 
+"""
 class UserSerializer(serializers.ModelSerializer):
     token = serializers.SerializerMethodField('get_token')
     def get_token(self, obj):
@@ -18,40 +19,27 @@ class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.CharField(max_length=80)
     username = serializers.CharField(max_length=45)
     password = serializers.CharField(min_length=8, write_only=True)
+    job = serializers.CharField(max_length=80)
+    id_card = serializers.CharField(max_length=20)
     class Meta:
         model = User
-        fields = ["email", "username", "password"]
+        fields = ["email", "username", "password", "job", "id_card"]
     def validate(self, attrs):
         email_exists = User.objects.filter(email=attrs["email"]).exists()
-
         if email_exists:
             raise ValidationError("Email has already been used")
-
         return super().validate(attrs)
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-
         user = super().create(validated_data)
-
         user.set_password(password)
-
         user.save()
-
         Token.objects.create(user=user)
-
         return user
 
-class PacientSerializer(serializers.ModelSerializer):
-    user = UserSerializer
-    class Meta:
-        model = Pacient
-        fields = ('id', 'user', 'name', 'gender', 'address', 'phone_number', 'birth_date', 'id_card')
-
 class ConsultReservationSerializer(serializers.ModelSerializer):
-    pacient = PacientSerializer
-    doctor = DoctorSerializer
     class Meta:
-        model = Consult
-        fields = ('id', 'scheduled_date', 'consult_date', 'pacient', 'doctor', 'status', 'description')
-    
+        model = ConsultReservation
+        fields = ('id', 'scheduled_date', 'consult_date', 'pacient_id_card', 'doctor_id_card', 'status', 'description')
+"""

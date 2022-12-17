@@ -15,15 +15,10 @@ urlpatterns = [
 
     path('signup/', views.signup, name='signup'),
 
-    path('pacient-signup/', views.pacient_signup, name='pacient-signup'),
 
-    path('delete-user/<str:id>', views.delete_user, name='delete-user'),
-    path('update-user/', views.update_user, name='update-user'),
-    path('update-pacient/<str:pacient_id>/', views.update_pacient, name='update-pacient'),
 
     path('consults/', views.consults, name='consults'),
     path('consult-reservation/', views.consult_reservation, name='consult-reservation'),
-    path('doctor-info/<str:id>/', views.doctor_info, name='doctor-info'),
 
 
 

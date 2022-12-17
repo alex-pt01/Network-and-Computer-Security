@@ -23,7 +23,7 @@ class updateUserForm(forms.Form):
 
 class DoctorForm(forms.Form):
     name = forms.CharField(label="Name", max_length=150, required=True)
-    specialization = forms.ChoiceField(choices=[(x.id, x.name) for x in Specialization.objects.all()])
+    #specialization = forms.ChoiceField(choices=[(x.id, x.name) for x in Specialization.objects.all()])
     gender = forms.ChoiceField(choices=(('Female','Female'), ('Male','Male'),('Other','Other')),required=True)
     address = forms.CharField(label="Address", max_length=400, required=True)
     phone_number = forms.IntegerField(label="Phone number", help_text='Must have 9 numbers', required=True)
@@ -57,13 +57,13 @@ class DateTimeLocalField(forms.DateTimeField):
 
 class ConsultReservationForm(forms.Form):
     consult_date  = DateTimeLocalField()
-    pacient = forms.ChoiceField(choices=[(x.id, str(x.name) +  " --- ID CARD: " +  str(x.id_card)) for x in Pacient.objects.all()])
-    doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
+    #pacient = forms.ChoiceField(choices=[(x.id, str(x.name) +  " --- ID CARD: " +  str(x.id_card)) for x in Pacient.objects.all()])
+    #doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
     status = forms.ChoiceField( choices=(('WAITING','WAITING'),('ACCEPT','ACCEPT'), ('DONE','DONE')))
     description = forms.CharField(label="Description", max_length=450, required=True)
 
 class ConsultPacientForm(forms.Form):
     consult_date  = DateTimeLocalField()
-    doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
+    #doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in Doctor.objects.all()])
     description = forms.CharField(label="Description", max_length=450, required=True)
 

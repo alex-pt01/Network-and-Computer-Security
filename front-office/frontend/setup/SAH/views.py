@@ -6,11 +6,20 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as loginUser, logout as logoutUser
 from SAH.forms import *
 from SAH.models import *
-
 from django.http import HttpRequest, HttpResponseRedirect
 from time import strptime
 from datetime import datetime
+import json
+import requests
 
+URL = "http://127.0.0.1:8002/"
+
+HEADERS = {
+    "accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+ACCESS_TOKEN = None
 def login(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -18,15 +27,24 @@ def login(request):
         if request.method == 'POST':
             username = request.POST.get('user')
             password = request.POST.get('pass')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                loginUser(request, user)
+            
+            params = { "username": username, "password": password }
+            resp = requests.post(URL+'api/login/', headers = HEADERS ,data=json.dumps(params))
+            tk = json.loads(resp.text)['tokens']['access']
+            if resp.status_code != 200:
+                print('error: ' + str(resp.status_code))
+                messages.info(request, 'Username OR password is incorrect')
+
+            else:
+                print('token: ' + str(tk))
+                ACCESS_TOKEN = str(tk)
+                print('Success')
                 messages.success(request, 'Welcome!!! ')
                 return redirect('home')
-            else:
-                messages.info(request, 'Username OR password is incorrect')
         context = {}
         return render(request, 'login.html', context)
+
+
 
 def signup(request):
     if request.user.is_authenticated:
@@ -43,76 +61,6 @@ def signup(request):
                 return redirect('home')
         return render(request, 'signup.html', {'form': form})
 
-def delete_user(request, id):
-    user = User.objects.get(id=id)
-    user.delete()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-def update_user(request):
-    tparams = {}
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = updateUserForm(request.POST)
-            if form.is_valid():
-                data = form.cleaned_data
-                username = data['username']
-                email = data['email']
-                curPass = data['currentPassword']
-                newPass = data['newPassword']
-                newRepeatedPass = data['repeatNewPassword']
-                firstName = data['first_name']
-                lastName = data['last_name']
-                if newPass != newRepeatedPass:
-                    form = updateUserForm()
-                    tparams['form'] = form
-                    tparams['error'] = "Inserted Passwords Are Not The Same"
-                    return render(request, 'update-user.html', tparams)
-                if request.user.check_password(curPass):
-
-                    user = request.user
-                    user.username = username
-                    user.first_name = firstName
-                    user.last_name = lastName
-                    user.email = email
-                    user.set_password(raw_password=newPass)
-                    user.save()
-                else:
-                    form = updateUserForm()
-                    tparams['form'] = form
-                    tparams['error'] = "Incorrect Password"
-                    return render(request, 'update-user.html', tparams)
-                return redirect('login')
-        else:
-            form = updateUserForm()
-        tparams['form'] = form
-        return render(request, 'update-user.html', tparams)
-    return redirect('login')
-
-
-
-
-def pacient_signup(request):
-    if not request.user.is_superuser:
-        if request.method == 'POST':
-            form = PacientForm(request.POST, request.FILES)
-            
-            if form.is_valid():
-                pacient = Pacient(user = User.objects.all().last(),
-                name = form.cleaned_data['name'], 
-                gender= form.cleaned_data['gender'],
-                address = form.cleaned_data['address'],
-                phone_number = form.cleaned_data['phone_number'],
-                birth_date = form.cleaned_data['birth_date'],
-                id_card = form.cleaned_data['id_card'],
-                )
-                pacient.save()
-                return redirect('home')
-            else:
-                print(form.errors)
-        else:
-            form = PacientForm()
-        return render(request, 'pacient-signup.html', {'form': form})
-    return redirect('login')
 
 def logout(request):
     logoutUser(request)

@@ -57,7 +57,7 @@ class LoginView(APIView):
             response = {"message": "Login Successfull", "tokens": tokens}
             return Response(data=response, status=status.HTTP_200_OK)
         else:
-            return Response(data={"message": "Invalid email or password"})
+            return Response(data={"message": "Invalid username or password"})
 
     def get(self, request: Request):
         content = {"user": str(request.user), "auth": str(request.auth)}

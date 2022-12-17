@@ -4,7 +4,7 @@ from datetime import datetime
 from django.conf import settings    
 from django.contrib.auth.models import User
 
-
+"""
 class Pacient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
@@ -52,3 +52,4 @@ class ConsultReservation(models.Model):
 
 class Meta:
     app_label  = 'SAH'
+"""
