@@ -25,6 +25,10 @@ python3 -m pip install django-allauth
 pip3 install django-sslserver
 pip3 install django-debug-toolbar
 pip3 install django-createsuperuser
+pip3 install djangorestframework
+pip3 install django-cors-headers
+pip3 install serializers
+pip3 install djangorestframework-simplejwt
 ```
 
 **START working**
