@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <style>
+        .styled-table {
+            border-collapse: collapse;
+            width:76%;
+            margin-left:12%;
+            margin-right:12%;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+        }
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #009879;
+            text-align: left;
+        }
+
+            .styled-table th,
+             .styled-table td {
+                padding: 30px 15px;
+                }
+
+
+            .styled-table tbody tr:nth-of-type(even) {
+                background-color: #f3f3f3;
+            }
+
+            .styled-table tbody tr:last-of-type {
+                border-bottom: 2px  #009879;
+            }
+
+            .styled-table tbody tr.active-row {
+                color: #009879;
+            }
+    </style>
+    <!--PRODUCTS MANAGEMENT-->
+      
+
+
+
+	<section style="width: 100%; height:auto"><!--form-->
+        <p>
+            <a class="btn btn-sm btn-primary" style="
+             float:right;margin-right:180px"  href="{% url 'consults-management' %}" > Back </a>
+         </p>
+        <div >
+                <div   >
+
+                <table class="styled-table">
+                <tr>
+                    <th>Pacient name</th>
+                    <th>Pacient gender</th>
+                    <th>Pacient address</th>
+                    <th>Pacient phone_number</th>
+                    <th>Pacient birth_date</th>
+                    <th>Pacient id_card</th>
+              
+           
+                </tr>
+                    <tr>
+                        <th>{{ pacient.name }}</th>
+                        <th>{{ pacient.gender }}</th>
+                        <th>{{ pacient.address }}</th>
+                        <th>{{ pacient.phone_number }}</th>
+                        <th>{{ pacient.birth_date }}</th>
+                        <th>{{ pacient.id_card }}</th>
+                    </tr>
+                </table>
+        </div>
+    </div>
+	</section>
+
+
+
+{% endblock %}
+

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>SAH</title>
+
+    {% load static %}
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link  href="{% static "css/font-awesome.min.css" %}"  rel="stylesheet">
+    <link href="{% static "css/prettyPhoto.css" %}"  rel="stylesheet">
+    <link href="{% static "css/price-range.css" %}" rel="stylesheet">
+    <link href="{% static "css/animate.css" %}" rel="stylesheet">
+    <link href="{% static "css/main.css" %}" rel="stylesheet">
+    <link href="{% static "css/responsive.css" %}" rel="stylesheet">
+    
+
+    <!--[if lt IE 9]>
+    <script  src="{% static 'js/html5shiv.js' %}" ></script>
+    <script  src="{% static 'js/respond.min.js' %}" ></script>
+    <![endif]-->
+
+</head><!--/head-->
+
+<body >
+
+	<header ><!--header-->
+
+		<div style="height: 300px; background-color: #2a6496;" ><!--header-middle-->
+            <img src="../static/images/img-1.png" style=" background-repeat: no-repeat; position: absolute; height: 250px; width: auto; filter: brightness(10) invert(1); margin-top:20px; margin-left: 67%;" >
+
+            <div class="container">
+				<div class="row">
+					<div class="col-md-8 clearfix">
+						<div class="logo pull-left"  style="margin-top: 95px">
+                            <a href="{% url "home" %}" > <span style="color: darkorange; font-size: 55px; font-style: italic"   >Saint Acutis </span></a><span style="color: whitesmoke; font-size: 45px;"   >hospital</span></a>
+						</div>
+					</div>
+
+					<div class="col-md-12 clearfix" style="margin-top: 90px;">
+						<div class="shop-menu clearfix pull-right">
+							<ul style="float:right" class="nav navbar-nav" >
+								
+
+
+                                {% if user.is_authenticated %}
+								    <li><a style="background-color: #2a6496; color: white"  href="" > Welcome, {{ user.get_username }}</a></li>
+                                    <li><a style="background-color: #2a6496; color: white" href="{% url 'account' %}"><i class="fa fa-user"></i> Account</a></li>
+                                    <li ><a style="background-color: #2a6496; color:white"  href="{% url "logout" %}"><i class="icon-signout"></i>Logout </a></li>
+                                {% else %}
+								    <li><a style="background-color: #2a6496; color:white" href="{% url 'login' %}" ><i class="fa fa-sign-in" aria-hidden="true"></i>Login</a></li>
+                                {%  endif %}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--/header-middle-->
+
+
+            <div class="header-bottom">
+                <div class="container " >
+                    <div class="row">
+                        <div class="col-sm-12">
+    
+                            <div class="mainmenu  col-sm-12  pull-left" >
+                                <ul style="float:left" class="nav navbar-nav collapse navbar-collapse">
+                                    {% if user.is_authenticated and user.is_superuser %}
+
+                                    <li><a href="{% url "home" %}" >Home</a></li>
+                                    <li><a href="{% url "consults-management" %}" >Consults Management</a></li>
+                                    <li><a href="{% url "room-consult-management" %}" >Room Reservation</a></li>
+                                    <li><a href="{% url "rooms-management" %}" >Room Management</a></li>
+
+                                    <li><a href="{% url "users-management" %}" >User Management</a></li>
+                                    {%  elif user.is_authenticated %}
+                                    <li><a href="{% url "home" %}" >Home</a></li>
+
+                                    <li><a href="{% url "consults" %}" >Consults</a></li>
+                                    {%  else %}
+                                    <li><a href="{% url "home" %}" >Home</a></li>
+                                    <li><a href="{% url "consults" %}" >Consults</a></li>
+
+                                    {%  endif %}
+
+    
+                                    
+    
+                                </ul>
+                            </div>
+                        </div>
+    
+                    </div>
+                    </div>
+                </div>
+	</header>
+
+
+
+
+            {% block content %}
+
+            {% endblock %}
+
+
+    <!-- Plugin JavaScript -->
+    <script src="{% static 'js/jquery.js' %}" ></script>
+	<script src="{% static 'js/price-range.js' %}"></script>
+    <script src="{% static 'js/jquery.scrollUp.min.js' %}" ></script>
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script src="{% static 'js/bootstrap.min.js' %}" ></script>
+    <script src="{% static 'js/jquery.prettyPhoto.js' %}" ></script>
+    <script src="{% static 'js/main.js' %}" ></script>
+            <script>
+
+        $(function() {
+        setTimeout(function() { $("#hideDiv").fadeOut(1500); }, 1000)
+
+        })
+    </script>
+
+{% block scripts %}{% endblock %}
+
+
+</body>
+</html>

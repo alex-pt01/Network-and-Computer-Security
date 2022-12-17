@@ -1,0 +1,43 @@
+{% extends "layout_signup.html" %}
+
+{% block content %}
+
+	<section id="form"><!--form-->
+				<div    style="  margin:auto; margin-top: -80px;
+                      width:40%;
+                      padding:63px;
+                      ">
+					<div class="signup-form"><!--sign up form-->
+						<h2>New User Signup!</h2>
+					    <form method="POST" action="">
+						    {% csrf_token %}
+                            {{ form.as_p }}
+							<button style="float:right;" type="submit" class="btn btn-default">Signup</button>
+						</form>
+					</div>
+						
+		
+                </div><!--/sign up form-->
+
+				</div>
+
+			</div>
+    </div>
+	</section><!--/form-->
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
