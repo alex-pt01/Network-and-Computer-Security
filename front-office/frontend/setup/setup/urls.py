@@ -6,7 +6,7 @@ from SAH import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),    
+    #path('admin/', admin.site.urls),    
     path('', views.home, name='home'),    
     path('account/', views.account, name='account'), 
        

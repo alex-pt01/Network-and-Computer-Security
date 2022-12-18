@@ -11,6 +11,9 @@ from time import strptime
 from datetime import datetime
 import json
 import requests
+from localStoragePy import localStoragePy
+
+localStorage = localStoragePy('SAH-frontend', 'SAH-backend')
 
 URL = "http://127.0.0.1:8002/"
 
@@ -19,37 +22,54 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-ACCESS_TOKEN = None
+ACCESS_TOKEN_DICT = {}
+
+def user_is_authenticated(request, token):
+    params = { "token": token }
+    resp = requests.post(URL+'jwt/verify/', headers = HEADERS ,data=json.dumps(params))
+    if resp == {}:
+        return True
+    else:
+        del request.session['token']
+        del request.session['username']
+        return False
+
+
 def login(request):
-    if request.user.is_authenticated:
-        return redirect('home')
+    print(request.session)
+    if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
     else:
         if request.method == 'POST':
             username = request.POST.get('user')
             password = request.POST.get('pass')
-            
             params = { "username": username, "password": password }
             resp = requests.post(URL+'api/login/', headers = HEADERS ,data=json.dumps(params))
             tk = json.loads(resp.text)['tokens']['access']
             if resp.status_code != 200:
                 print('error: ' + str(resp.status_code))
                 messages.info(request, 'Username OR password is incorrect')
-
             else:
                 print('token: ' + str(tk))
-                ACCESS_TOKEN = str(tk)
+                ACCESS_TOKEN_DICT[username] = str(tk)
+                request.session['token'] = str(tk)
+                request.session['username'] = username
+
                 print('Success')
+                print(request.session['username'])
                 messages.success(request, 'Welcome!!! ')
-                return redirect('home')
+                context = {'username': username}
+
+                return render(request, 'home.html', context)
         context = {}
         return render(request, 'login.html', context)
 
-
-
 def signup(request):
-    if request.user.is_authenticated:
+    if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         messages.info(request, 'You are already registered')
-        return redirect('home')
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
     else:
         form = newUserForm()
         if request.method == 'POST':
@@ -61,13 +81,18 @@ def signup(request):
                 return redirect('home')
         return render(request, 'signup.html', {'form': form})
 
-
 def logout(request):
-    logoutUser(request)
-    return redirect('home')
+    del request.session['token']
+    del request.session['username']
+    context = {}
+    return render(request, 'home.html', context)
 
 def home(request):
     return render(request, 'home.html', {"form": "forms"})
+
+
+
+
 
 def consults(request):
     consults = None
@@ -148,6 +173,6 @@ def update_pacient(request, pacient_id):
 
 def doctor_info(request, id):
     if request.user.is_authenticated:
-        doctor = Doctor.objects.get(id=id)
+        doctor = "Doctor.objects.get(id=id)"
         return render(request, "doctor-info.html", {"doctor": doctor})    
     return redirect('login')

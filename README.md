@@ -29,6 +29,7 @@ pip3 install djangorestframework
 pip3 install django-cors-headers
 pip3 install serializers
 pip3 install djangorestframework-simplejwt
+pip3 install localStoragePy
 ```
 
 **START working**

@@ -46,9 +46,8 @@
 								
 
 
-                                {% if user.is_authenticated %}
-								    <li><a style="background-color: #2a6496; color: white"  href="" > Welcome, {{ user.get_username }}</a></li>
-                                    <li><a style="background-color: #2a6496; color: white" href="{% url 'account' %}"><i class="fa fa-user"></i> Account</a></li>
+                                {% if 'token' in request.session %}
+								    <li><a style="background-color: #2a6496; color: white"  href="" > Welcome, {{ username }}</a></li>
                                     <li ><a style="background-color: #2a6496; color:white"  href="{% url "logout" %}"><i class="icon-signout"></i>Logout </a></li>
                                 {% else %}
 								    <li><a style="background-color: #2a6496; color:white" href="{% url 'login' %}" ><i class="fa fa-sign-in" aria-hidden="true"></i>Login</a></li>
