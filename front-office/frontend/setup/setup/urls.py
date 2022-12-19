@@ -8,16 +8,14 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     #path('admin/', admin.site.urls),    
     path('', views.home, name='home'),    
-    path('account/', views.account, name='account'), 
        
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
-
     path('signup/', views.signup, name='signup'),
-
-
-
+    path('profile/', views.profile, name='profile'),
     path('consults/', views.consults, name='consults'),
+    #path('doctors/', views.doctors, name='doctors'),
+
     path('consult-reservation/', views.consult_reservation, name='consult-reservation'),
 
 

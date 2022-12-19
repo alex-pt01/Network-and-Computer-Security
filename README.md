@@ -7,11 +7,11 @@ username: adminsirs
 password: @adsirs123
 
 DOCTOR
-username: doctor3
+username: doctor5
 password: @sirs1234
 
 PACIENT
-username: pacient 
+username: peter 
 password: @sirs1234
 ```
 

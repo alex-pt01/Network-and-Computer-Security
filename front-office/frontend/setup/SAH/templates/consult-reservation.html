@@ -13,9 +13,15 @@
                             {{ form.consult_date }}
                             <br>
                             <label>Doctor:</label>
-                            {{ form.doctor }}
-                        
+                            {% for doctor in doctors %}
+                            <option value="{{doctor.id}}"
+                                {% if doctor == current_org %}selected="selected"{% endif %}>
+                                {{doctor.name|capfirst}}
+                            </option>
+                         {% endfor %}
                             <br>
+                            <label>Status:</label>
+                            {{ form.description }}
                             <label>Description:</label>
                             {{ form.description }}
                             <button style="float:right;" type="submit" class="btn btn-default">Create Consult</button>

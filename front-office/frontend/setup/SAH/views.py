@@ -1,11 +1,8 @@
-from django.shortcuts import render
 
-from django.shortcuts import render
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as loginUser, logout as logoutUser
 from SAH.forms import *
-from SAH.models import *
 from django.http import HttpRequest, HttpResponseRedirect
 from time import strptime
 from datetime import datetime
@@ -16,23 +13,30 @@ from localStoragePy import localStoragePy
 localStorage = localStoragePy('SAH-frontend', 'SAH-backend')
 
 URL = "http://127.0.0.1:8002/"
+URL_HOSPITAL = "http://127.0.0.1:8004/"
 
 HEADERS = {
     "accept": "application/json",
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    
 }
 
 ACCESS_TOKEN_DICT = {}
 
 def user_is_authenticated(request, token):
     params = { "token": token }
+
     resp = requests.post(URL+'jwt/verify/', headers = HEADERS ,data=json.dumps(params))
-    if resp == {}:
+    
+    print("RESP text", resp.text)
+    if resp.text == "{}":
         return True
     else:
+        print("FALSE")
         del request.session['token']
         del request.session['username']
         return False
+    
 
 
 def login(request):
@@ -43,25 +47,32 @@ def login(request):
     else:
         if request.method == 'POST':
             username = request.POST.get('user')
-            password = request.POST.get('pass')
-            params = { "username": username, "password": password }
-            resp = requests.post(URL+'api/login/', headers = HEADERS ,data=json.dumps(params))
-            tk = json.loads(resp.text)['tokens']['access']
-            if resp.status_code != 200:
-                print('error: ' + str(resp.status_code))
-                messages.info(request, 'Username OR password is incorrect')
-            else:
-                print('token: ' + str(tk))
-                ACCESS_TOKEN_DICT[username] = str(tk)
-                request.session['token'] = str(tk)
-                request.session['username'] = username
+            try:
+                password = request.POST.get('pass')
+                params = { "username": username, "password": password }
+                resp = requests.post(URL+'api/login/', headers = HEADERS ,data=json.dumps(params))
+                print("RESP ", resp)
+                tk = json.loads(resp.text)['tokens']['access']
+                if resp.status_code != 200:
+                    print('error: ' + str(resp.status_code))
+                    messages.info(request, 'Username OR password is incorrect')
+                else:
+                    print('token: ' + str(tk))
+                    ACCESS_TOKEN_DICT[username] = str(tk)
+                    request.session['token'] = str(tk)
+                    request.session['username'] = username
 
-                print('Success')
-                print(request.session['username'])
-                messages.success(request, 'Welcome!!! ')
-                context = {'username': username}
+                    print('Success')
+                    print(request.session['username'])
+                    messages.success(request, 'Welcome!!! ')
+                    context = {'username': username}
 
-                return render(request, 'home.html', context)
+                    return render(request, 'home.html', context)
+            except: 
+                context = {}
+                return render(request, 'login.html', context)
+
+
         context = {}
         return render(request, 'login.html', context)
 
@@ -75,11 +86,37 @@ def signup(request):
         if request.method == 'POST':
             form = newUserForm(request.POST)
             if form.is_valid():
-                form.save()
-                user = form.cleaned_data.get('username')
-                messages.success(request, 'Account was created for ' + user)
-                return redirect('home')
+                username = request.POST.get('username')
+                email = request.POST.get('email')
+
+                password1 = request.POST.get('password1')
+                #password2 = request.POST.get('password2')
+                params = { "username": username, "email": email, "password": password1}
+                resp = requests.post(URL+'api/signup/', headers = HEADERS ,data=json.dumps(params))
+                return redirect('profile')
         return render(request, 'signup.html', {'form': form})
+
+
+def profile(request):
+    if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
+        messages.info(request, 'You are already registered')
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
+    else:
+        form = userProfile()
+        if request.method == 'POST':
+            form = userProfile(request.POST)
+            if form.is_valid():
+
+                first_name = request.POST.get('first_name')
+                last_name = request.POST.get('last_name')
+                id_card = request.POST.get('id_card')
+                params = {  "first_name": first_name, "last_name": last_name, "id_card": id_card}
+                resp = requests.post(URL+'api/profile/', headers = HEADERS ,data=json.dumps(params))
+                context = {'username': request.session['username']}
+                return render(request, 'home.html', context)
+        return render(request, 'profile.html', {'form': form})
+
 
 def logout(request):
     del request.session['token']
@@ -88,26 +125,50 @@ def logout(request):
     return render(request, 'home.html', context)
 
 def home(request):
-    return render(request, 'home.html', {"form": "forms"})
-
-
-
-
+    if 'username' in request.session:
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
+    else:  
+        return render(request, 'home.html', {})
 
 def consults(request):
-    consults = None
-    user_type = None
-    if request.user.is_authenticated:
+    print(request.session['token'])
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
 
-        if Pacient.objects.filter(user_id=request.user.id).exists():
-            print("Pacient")
-            pacient = Pacient.objects.get(user__id= request.user.id)
-            consults = ConsultReservation.objects.filter(pacient=pacient)
-            user_type= 'P'
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }            
+        params = { "username": request.session['username']}
+        response = requests.get(URL+'api/consults/',headers = headers,data=json.dumps(params) )
+        context = {'username': request.session['username'], "consults": response.json()}
+        return render(request, 'consults.html', context)
+    else:
+        context = {}
+        return render(request, 'login.html', context)
 
-        return render(request, 'consults.html', {'consults': consults, 'user_type': user_type})
-    return redirect('login')
+def consult_reservation(request):
+    print(request.session['token'])
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
 
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }            
+        params = { "username": request.session['username']}
+        response = requests.get(URL_HOSPITAL+'api/doctors/',headers = headers,data=json.dumps(params) )
+        context = {'username': request.session['username'], "doctors": response.json()}
+        print(context["doctors"])
+        return render(request, 'consult-reservation.html', context["doctors"])
+
+    else:
+        context = {}
+        return render(request, 'home.html', context)
+
+
+"""
 def consult_reservation(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -130,49 +191,4 @@ def consult_reservation(request):
         return render(request, 'consult-reservation.html', {'form': form})
     return redirect('login')
 
-def account(request):
-    if request.user.is_authenticated:
-        if Pacient.objects.filter(user_id=request.user.id).exists():
-            print("PACIENT")
-            return render(request, 'account.html', {"user_type":"P","pacient": Pacient.objects.get(user_id=request.user.id)})
-        elif Doctor.objects.filter(user_id=request.user.id).exists():
-            print("DOCTOR")
-            doctor = Doctor.objects.get(user_id=request.user.id)
-            return render(request, 'account.html', {"user_type": "D", "doctor" : doctor})
-        else:
-            if request.user.is_superuser:
-                return redirect('account')
-    return redirect('login')
-
-
-
-def update_pacient(request, pacient_id):
-    if request.user.is_authenticated:
-        pacient = Pacient.objects.get(id=pacient_id)
-        if request.method == 'POST':
-            form = PacientForm(request.POST)
-            if form.is_valid():
-                pacient.name = form.cleaned_data['name'] 
-                pacient.gender= form.cleaned_data['gender']
-                pacient.address = form.cleaned_data['address']
-                number = form.cleaned_data['phone_number']
-                pacient.birth_date = form.cleaned_data['birth_date']
-                pacient.phone_number = number
-                pacient.save()
-                return redirect("home")
-        else:
-            form = PacientForm(initial={ "name": pacient.name,
-                                        "gender": pacient.gender,
-                                        "address": pacient.address,
-                                        "phone_number": pacient.phone_number,
-                                        "birth_date": pacient.birth_date,
-                                        "id_card": pacient.id_card,
-                                        })                
-        return render(request, "update-pacient.html", {"form": form})
-
-
-def doctor_info(request, id):
-    if request.user.is_authenticated:
-        doctor = "Doctor.objects.get(id=id)"
-        return render(request, "doctor-info.html", {"doctor": doctor})    
-    return redirect('login')
+"""

@@ -23,9 +23,22 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser 
 from django.http.response import JsonResponse
+from rest_framework_simplejwt.backends import TokenBackend
 
 
 User = get_user_model()
+"""
+def get_user_by_token(request, headers):
+    token = headers.split(' ')[1]
+    data = {'token': token}
+    try:
+        valid_data = TokenBackend(algorithm='HS256').decode(token,verify=True)
+        user = valid_data['user']
+        print("### ", user)
+        request.user = user
+    except ValidationError as v:
+        print("validation error", v)
+"""        
 
 def create_jwt_pair_for_user(user: User):
     refresh = RefreshToken.for_user(user)
@@ -38,6 +51,7 @@ class SignUpView(generics.GenericAPIView):
 
     def post(self, request: Request):
         data = request.data
+        print("DATA ", data)
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -67,36 +81,54 @@ class LoginView(APIView):
 def home(request):
     return render(request, 'home.html', {"form": "forms"})
 
-@api_view(['GET', 'POST'])
+
+    
+@api_view([ 'GET', 'POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
-def consults_reservation_to_hospital(request):
-    if request.method == 'GET': #mesmo que hospital_consults
-        try:
-            consults = ConsultReservation.objects.all()
-        except ConsultReservation.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+def consults(request):
+    try: 
+        username = JSONParser().parse(request) 
+        pacient_id_card =  UserProfilee.objects.get(username=username["username"]).id_card
+        consults = ConsultReservation.objects.get(pacient_id_card=pacient_id_card)
         serializer = ConsultReservationSerializer(consults, many=True, context={"request": request})
         return Response(serializer.data)
  
-    elif request.method == 'POST':
-        consults_data = JSONParser().parse(request)
-        consult_serializer = ConsultReservationSerializer(data=consults_data)
-        if consult_serializer.is_valid():
-            consult_serializer.save()
-            return JsonResponse(consult_serializer.data, status=status.HTTP_201_CREATED) 
-        return JsonResponse(consult_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except ConsultReservation.DoesNotExist: 
+        return JsonResponse({'message': 'consult does not exist'}, status=status.HTTP_200_OK) 
     
-@api_view(['PUT', 'DELETE'])
+@api_view([ 'POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
-def consult_reservation_to_hospital(request,pk):
+def fill_profile(request):
+    new_profile = {}
+    if request.method == 'POST':
+        user_profile_data = JSONParser().parse(request)
+        print("USER PROFILE  ", user_profile_data)
+        user = User.objects.all().last()
+        new_profile['username']=user.username
+        new_profile.update(user_profile_data)
+        print("NEW USER PROFILE  ", new_profile)
+        print()
+        user_profile_serializer = UserProfileSerializer(data=new_profile)
+        if user_profile_serializer.is_valid():
+            user_profile_serializer.save()
+            return JsonResponse(user_profile_serializer.data, status=status.HTTP_201_CREATED) 
+        return JsonResponse(user_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+#TODO-------------------------------------------------------------------°
+@api_view([ 'GET', 'DELETE'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def consult_reservation_by_id_card(request,pk):
     try: 
         consult = ConsultReservation.objects.get(pk=pk) 
     except ConsultReservation.DoesNotExist: 
         return JsonResponse({'message': 'consult does not exist'}, status=status.HTTP_404_NOT_FOUND) 
     
-    if request.method == 'PUT': 
+    if request.method == 'GET': 
             consults_data = JSONParser().parse(request) 
             consult_serializer = ConsultReservationSerializer(consult, data=consults_data) 
             if consult_serializer.is_valid(): 
@@ -108,3 +140,6 @@ def consult_reservation_to_hospital(request,pk):
         consult.delete() 
         return JsonResponse({'message': 'Consult was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
 
+    elif request.method == 'GET': 
+        consult.delete() 
+        return JsonResponse({'message': 'Consult was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)

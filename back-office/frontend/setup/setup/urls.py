@@ -17,16 +17,20 @@ urlpatterns = [
     
     
     #API
-    path("api/signup/", views.SignUpView.as_view()),
-    path("api/login/", views.LoginView.as_view()),
+    path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
+    path('signup/', views.signup, name='signup'),
+    path('profile/', views.profile, name='profile'),
+    path('consults/', views.consults, name='consults'),
+
+
+
+
     path('api/doct-consults/<str:doctor_id_card>', views.doctor_consults),
     path('api/hosp-consults/', views.hospital_consults),
     path('api/room/', views.room),
     path('api/room_consult/', views.room_consult),
     path('api/external_lab/', views.external_lab),
-
-    #to delete = ao hosp-consults 
-    path("api/h-consults/", views.hosp_consults),
 
 
 

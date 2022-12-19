@@ -44,7 +44,6 @@ class SignUpView(generics.GenericAPIView):
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class LoginView(APIView):
     permission_classes = []
     def post(self, request: Request):
@@ -63,6 +62,23 @@ class LoginView(APIView):
         content = {"user": str(request.user), "auth": str(request.auth)}
         return Response(data=content, status=status.HTTP_200_OK)
 
+
+@api_view([ 'GET'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def doctors(request):
+    try: 
+        doctor = DoctorProfilee.objects.all()
+        doctor_serializer = DoctorProfileSerializer(doctor, many=True)
+        return Response(doctor_serializer.data)
+    except DoctorProfilee.DoesNotExist: 
+        return JsonResponse({'message': 'consult does not exist'}, status=status.HTTP_200_OK) 
+
+
+
+
+
+#TODO
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])

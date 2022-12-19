@@ -14,10 +14,13 @@ urlpatterns = [
     path("jwt/create/", TokenObtainPairView.as_view(), name="jwt_create"),
     path("jwt/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("jwt/verify/", TokenVerifyView.as_view(), name="token_verify"),
-    
+    path('admin/', admin.site.urls),    
     #API https://www.bezkoder.com/django-rest-api/ 
     path("api/signup/", views.SignUpView.as_view()),
     path("api/login/", views.LoginView.as_view()),
+    path("api/doctors/", views.doctors),
+
+
     path('api/doct-consults/<str:doctor_id_card>', views.doctor_consults),
     
     path('api/hosp-consults/', views.hospital_consults),

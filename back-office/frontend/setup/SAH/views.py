@@ -1,81 +1,154 @@
 from pyexpat.errors import messages
-from django.contrib.auth import authenticate
 from django.shortcuts import HttpResponseRedirect, redirect, render
 from rest_framework import generics, status
-from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from SAH.serializers import SignUpSerializer
-from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
+
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.authtoken.models import Token
-from SAH.serializers import *
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from SAH.forms import *
 from django.contrib.auth import authenticate, login as loginUser, logout as logoutUser
 from django.http import HttpRequest, HttpResponseRedirect
 from django.http.response import JsonResponse
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 from rest_framework.parsers import JSONParser 
+import json
+import requests
+
+URL_HOSPITAL = "http://127.0.0.1:8004/"
+
+HEADERS = {
+    "accept": "application/json",
+    "Content-Type": "application/json",
+}
+
+ACCESS_TOKEN_DICT = {}
+
+def user_is_authenticated(request, token):
+    params = { "token": token }
+
+    resp = requests.post(URL_HOSPITAL+'jwt/verify/', headers = HEADERS ,data=json.dumps(params))
+    
+    print("RESP text", resp.text)
+    if resp.text == "{}":
+        return True
+    else:
+        print("FALSE")
+        del request.session['token']
+        del request.session['username']
+        return False
+    
 
 
-User = get_user_model()
+def login(request):
+    print(request.session)
+    if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
+    else:
+        if request.method == 'POST':
+            username = request.POST.get('user')
+            try:
+                password = request.POST.get('pass')
+                params = { "username": username, "password": password }
+                resp = requests.post(URL_HOSPITAL+'api/login/', headers = HEADERS ,data=json.dumps(params))
+                print("RESP ", resp)
+                tk = json.loads(resp.text)['tokens']['access']
+                if resp.status_code != 200:
+                    print('error: ' + str(resp.status_code))
+                    messages.info(request, 'Username OR password is incorrect')
+                else:
+                    print('token: ' + str(tk))
+                    ACCESS_TOKEN_DICT[username] = str(tk)
+                    request.session['token'] = str(tk)
+                    request.session['username'] = username
 
-def create_jwt_pair_for_user(user: User):
-    refresh = RefreshToken.for_user(user)
-    tokens = {"access": str(refresh.access_token), "refresh": str(refresh)}
-    return tokens
+                    print('Success')
+                    print(request.session['username'])
+                    messages.success(request, 'Welcome!!! ')
+                    context = {'username': username}
 
-class SignUpView(generics.GenericAPIView):
-    serializer_class = SignUpSerializer
-    permission_classes = []
+                    return render(request, 'home.html', context)
+            except: 
+                context = {}
+                return render(request, 'login.html', context)
+        context = {}
+        return render(request, 'login.html', context)
 
-    def post(self, request: Request):
-        data = request.data
-        serializer = self.serializer_class(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            response = {"message": "User Created Successfully", "data": serializer.data}
-            return Response(data=response, status=status.HTTP_201_CREATED)
-        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def signup(request):
+    if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
+        messages.info(request, 'You are already registered')
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
+    else:
+        form = newUserForm()
+        if request.method == 'POST':
+            form = newUserForm(request.POST)
+            if form.is_valid():
+                username = request.POST.get('username')
+                email = request.POST.get('email')
 
-
-
-class LoginView(APIView):
-    permission_classes = []
-    def post(self, request: Request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            tokens = create_jwt_pair_for_user(user)
-            response = {"message": "Login Successfull", "tokens": tokens}
-            return Response(data=response, status=status.HTTP_200_OK)
-        else:
-            return Response(data={"message": "Invalid email or password"})
-
-    def get(self, request: Request):
-        content = {"user": str(request.user), "auth": str(request.auth)}
-        return Response(data=content, status=status.HTTP_200_OK)
+                password1 = request.POST.get('password1')
+                #password2 = request.POST.get('password2')
+                params = { "username": username, "email": email, "password": password1}
+                resp = requests.post(URL_HOSPITAL+'api/signup/', headers = HEADERS ,data=json.dumps(params))
+                return redirect('profile')
+        return render(request, 'signup.html', {'form': form})
 
 
+def profile(request):
+    if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
+        messages.info(request, 'You are already registered')
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
+    else:
+        form = doctorProfile()
+        if request.method == 'POST':
+            form = doctorProfile(request.POST)
+            if form.is_valid():
+                specialization = request.POST.get('specialization')
+                first_name = request.POST.get('first_name')
+                last_name = request.POST.get('last_name')
+                id_card = request.POST.get('id_card')
+                params = {"specialization": specialization, "first_name": first_name, "last_name": last_name, "id_card": id_card}
+                resp = requests.post(URL_HOSPITAL+'api/profile/', headers = HEADERS ,data=json.dumps(params))
+                context = {}
+                return render(request, 'home.html', context)
+        return render(request, 'profile.html', {'form': form})
 
-#DELETE > repetido em hospital_consults
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
-@authentication_classes([TokenAuthentication])
-def hosp_consults(request):
-    try:
-        consults = Consult.objects.all()
-    except Consult.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    serializer = ConsultSerializer(consults, many=True, context={"request": request})
-    return Response(serializer.data)
+def logout(request):
+    del request.session['token']
+    del request.session['username']
+    context = {}
+    return render(request, 'home.html', context)
+
+
+def consults(request):
+    print(request.session['token'])
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }            
+        params = { "username": request.session['username']}
+        response = requests.get(URL_HOSPITAL+'api/consults/',headers = headers,data=json.dumps(params) )
+        context = {'username': request.session['username'], "consults": response.json()}
+        return render(request, 'consults.html', context)
+    else:
+        context = {}
+        return render(request, 'login.html', context)
+
+def home(request):
+    if 'username' in request.session:
+        context = {'username': request.session['username']}
+        return render(request, 'home.html', context)
+    else:  
+        return render(request, 'home.html', {})
+
+
 
 
 
@@ -195,8 +268,6 @@ def external_lab(request):
         return JsonResponse({'message': '{} Room were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
 
 
-def home(request):
-    return render(request, 'home.html', {"form": "forms"})
 
 
 

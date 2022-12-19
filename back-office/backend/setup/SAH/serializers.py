@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.validators import ValidationError
 
-class UserDoctorSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     token = serializers.SerializerMethodField('get_token')
     def get_token(self, obj):
         return self.context.get("token")
@@ -16,23 +16,22 @@ class UserDoctorSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'is_superuser','date_joined', 'token')
 
+class DoctorProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorProfilee
+        fields = ('id', 'specialization', 'username', 'first_name', 'last_name', 'id_card')
+    
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.CharField(max_length=80)
     username = serializers.CharField(max_length=45)
     password = serializers.CharField(min_length=8, write_only=True)
-    job = serializers.CharField(max_length=80)
-    specialization = serializers.CharField(max_length=80)
-    id_card = serializers.CharField(max_length=20)
-
     class Meta:
         model = User
-        fields = ["email", "username", "password", "job", "specialization", "id_card"]
+        fields = ["email", "username", "password"]
     def validate(self, attrs):
         email_exists = User.objects.filter(email=attrs["email"]).exists()
-
         if email_exists:
             raise ValidationError("Email has already been used")
-
         return super().validate(attrs)
 
     def create(self, validated_data):

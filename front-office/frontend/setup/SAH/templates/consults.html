@@ -42,10 +42,10 @@
 
 	<section style="width: 100%; height:auto"><!--form-->
         <p>
-            {% if user.is_authenticated and user_type == 'P' %}
+          
             <a class="btn btn-sm btn-success" style="
              float:right;margin-right:180px"  href="{% url 'consult-reservation' %}" > Create Consult </a>
-            {%  endif %}
+        
 
          </p>
         <div   >
@@ -62,7 +62,6 @@
                     <th style="color:#2a6496">Doctor name</th>
                     <th style="color:#2a6496">Doctor specialization</th>
                     <th style="color:#2a6496">Doctor ID card</th>
-                    <th style="color:#2a6496">Doctor + info</th>
            
                 </tr>
                 {% for consult in consults %}
@@ -78,7 +77,6 @@
                         <th style="color:#2a6496">{{ consult.doctor.specialization }}</th>
                         <th style="color:#2a6496">{{ consult.doctor.id_card }}</th>
 
-                        <th><a class="btn btn-sm btn-secondary" href="{% url 'doctor-info' consult.doctor.id %}">Info</a></th>
 
 
                     </tr>

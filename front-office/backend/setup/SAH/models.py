@@ -5,7 +5,14 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 
-
+class UserProfilee(models.Model):
+    username = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    id_card = models.CharField(max_length=30, unique=True)
+    
+    def __str__(self):
+        return self.username
 
 class ConsultReservation(models.Model):
     scheduled_date = models.DateTimeField(default=datetime.now, null=True)

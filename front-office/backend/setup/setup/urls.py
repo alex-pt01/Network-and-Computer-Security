@@ -3,8 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path,include
 from SAH import views
-from django.contrib.auth import views as auth_views
-from django.contrib.auth import views as auth_views
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -22,9 +21,10 @@ urlpatterns = [
     #API https://www.bezkoder.com/django-rest-api/ 
     path("api/signup/", views.SignUpView.as_view()),
     path("api/login/", views.LoginView.as_view()),
+    path('api/profile/', views.fill_profile),
 
-    path('api/hosp-consults-reservation/', views.consults_reservation_to_hospital),
-    path('api/hosp-consult-reservation/<int:pk>/', views.consult_reservation_to_hospital)
+    path('api/consults/', views.consults),
+    #path('api/hosp-consult-reservation/<int:pk>/', views.consult_reservation_to_hospital)
 ]
 
 if settings.DEBUG:

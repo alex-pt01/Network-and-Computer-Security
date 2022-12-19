@@ -5,11 +5,9 @@ from django import forms
 from SAH.models import  *
 
 class newUserForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ['username','email', 'password1', 'password2']
 
 class updateUserForm(forms.Form):
     first_name = forms.CharField(label='First Name', required=True)

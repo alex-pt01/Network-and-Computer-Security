@@ -14,15 +14,19 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'is_superuser','date_joined', 'token')
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfilee
+        fields = ('id', 'username', 'first_name', 'last_name', 'id_card')
+    
+
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.CharField(max_length=80)
     username = serializers.CharField(max_length=45)
     password = serializers.CharField(min_length=8, write_only=True)
-    job = serializers.CharField(max_length=80)
-    id_card = serializers.CharField(max_length=20)
     class Meta:
         model = User
-        fields = ["email", "username", "password", "job", "id_card"]
+        fields = ["email", "username", "password"]
     def validate(self, attrs):
         email_exists = User.objects.filter(email=attrs["email"]).exists()
         if email_exists:

@@ -4,34 +4,18 @@ from datetime import datetime
 from django.conf import settings    
 from django.contrib.auth.models import User
 
-"""
-class Pacient(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
-    gender = models.CharField(max_length=150, choices=(('Female','Female'), ('Male','Male'),('Other','Other')))
-    address = models.CharField(max_length=400)
-    phone_number = models.IntegerField( blank=True, null=True)
-    birth_date = models.DateField( blank=True, null=True)
-    id_card = models.IntegerField( blank=True, null=True)
-    def __str__(self):
-        return self.name
 
 
-
-
-class Doctor(models.Model):
+class DoctorProfilee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     specialization = models.CharField(max_length=150, choices=(('Orthopedy','Orthopedy'), ('Cardiology','Cardiology'),('Dermatology','Dermatology')))
-    name = models.CharField(max_length=200)
-
-    address = models.CharField(max_length=400)
-    phone_number = models.IntegerField( blank=True, null=True)
-    birth_date = models.DateField( blank=True, null=True)
-    id_card = models.IntegerField( blank=True, null=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    id_card = models.CharField(max_length=30, unique=True)
 
     def __str__(self):
         return self.name
-"""
+
 
 class Consult(models.Model):
     scheduled_date = models.DateTimeField(default=datetime.now, null=True)

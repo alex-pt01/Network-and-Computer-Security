@@ -2,20 +2,18 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from SAH.models import  *
 
 class newUserForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    job = forms.CharField(max_length=30)
-    specialization = forms.CharField(required=True, label="Specialization")
-    phone_number = forms.CharField(required=True, label="Phone Number")
-    birth_date = forms.CharField(required=True, label="Birth Date")
-    id_card = forms.CharField(required=True, label="ID Card")
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'job', 'specialization', 'phone_number',  'email', 'birth_date', 'id_card', 'password1', 'password2']
-        #fields = UserCreationForm.Meta.fields + ('specialization',)
+        fields = ['username','email', 'password1', 'password2']
+
+class doctorProfile(forms.Form):
+    specialization = forms.ChoiceField(choices=(('Orthopedy','Orthopedy'), ('Cardiology','Cardiology'),('Dermatology','Dermatology')),required=True)
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    id_card = forms.CharField(required=True, label="ID Card")
+       
 """
 class updateUserForm(forms.Form):
     first_name = forms.CharField(label='First Name', required=True)
@@ -29,8 +27,7 @@ class updateUserForm(forms.Form):
     currentPassword = forms.CharField(label='Current Password', widget=forms.PasswordInput(), required=True)
     newPassword = forms.CharField(label='New Password', widget=forms.PasswordInput(), required=True)
     repeatNewPassword = forms.CharField(label='Repeat New Password', widget=forms.PasswordInput(), required=True)
-"""
-"""
+
 class DoctorForm(forms.Form):
     name = forms.CharField(label="Name", max_length=150, required=True)
     specialization = forms.ChoiceField(choices=[(x.id, x.name) for x in Specialization.objects.all()])
