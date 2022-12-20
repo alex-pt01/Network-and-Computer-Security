@@ -14,6 +14,7 @@ class UserProfilee(models.Model):
     def __str__(self):
         return self.username
 
+"""
 class ConsultReservation(models.Model):
     scheduled_date = models.DateTimeField(default=datetime.now, null=True)
     consult_date = models.DateTimeField( blank=True, null=True)
@@ -23,6 +24,6 @@ class ConsultReservation(models.Model):
     description = models.CharField(max_length=150)
     def __str__(self):
         return "Consult Date: " + str(self.consult_date) +  " --- Status: " + str(self.status) + " --- Doctor:    " + self.doctor.name + " --- Pacient: " + self.pacient.name
-
+"""
 class Meta:
     app_label  = 'SAH'

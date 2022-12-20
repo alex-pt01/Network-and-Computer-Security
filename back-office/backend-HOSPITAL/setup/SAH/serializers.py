@@ -1,3 +1,5 @@
+
+
 from SAH.models import *
 from rest_framework import serializers
 import base64
@@ -14,12 +16,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'is_superuser','date_joined', 'token')
 
-class UserProfileeSerializer(serializers.ModelSerializer):
+class DoctorProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserProfilee
-        fields = ('id', 'username', 'first_name', 'last_name', 'id_card')
+        model = DoctorProfilee
+        fields = ('id', 'username', 'specialization', 'first_name', 'last_name', 'id_card')
     
-
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.CharField(max_length=80)
     username = serializers.CharField(max_length=45)
@@ -41,3 +42,27 @@ class SignUpSerializer(serializers.ModelSerializer):
         Token.objects.create(user=user)
         return user
 
+
+class ConsultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Consult
+        fields = ('id', 'scheduled_date', 'consult_date', 'pacient_id_card', 'doctor_id_card', 'status', 'description')
+    
+
+class RoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ('id', 'number', 'floor')
+    
+class ConsultRoomReservationSerializer(serializers.ModelSerializer):
+    room = RoomSerializer
+    consult = ConsultSerializer
+    class Meta:
+        model = Room
+        fields = ('id', 'room', 'consult')
+
+class ExternalLabsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Consult
+        fields = ('id', 'pacient_id_card', 'doctor_id_card', 'lab_name', 'consult_lab_date', 'form_update_date', 'intro', 'materials', 'procedure', 'results', 'hash')
+    

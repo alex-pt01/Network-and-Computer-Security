@@ -24,7 +24,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import JSONParser 
 from django.http.response import JsonResponse
 from rest_framework_simplejwt.backends import TokenBackend
-
+import json
 
 User = get_user_model()
 """
@@ -77,27 +77,10 @@ class LoginView(APIView):
         content = {"user": str(request.user), "auth": str(request.auth)}
         return Response(data=content, status=status.HTTP_200_OK)
 
-
 def home(request):
     return render(request, 'home.html', {"form": "forms"})
 
-
-    
-@api_view([ 'GET', 'POST'])
-@permission_classes((AllowAny,))
-@authentication_classes([TokenAuthentication])
-def consults(request):
-    try: 
-        username = JSONParser().parse(request) 
-        pacient_id_card =  UserProfilee.objects.get(username=username["username"]).id_card
-        consults = ConsultReservation.objects.get(pacient_id_card=pacient_id_card)
-        serializer = ConsultReservationSerializer(consults, many=True, context={"request": request})
-        return Response(serializer.data)
- 
-    except ConsultReservation.DoesNotExist: 
-        return JsonResponse({'message': 'consult does not exist'}, status=status.HTTP_200_OK) 
-    
-@api_view([ 'POST'])
+@api_view(['POST'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
 def fill_profile(request):
@@ -110,36 +93,39 @@ def fill_profile(request):
         new_profile.update(user_profile_data)
         print("NEW USER PROFILE  ", new_profile)
         print()
-        user_profile_serializer = UserProfileSerializer(data=new_profile)
+        user_profile_serializer = UserProfileeSerializer(data=new_profile)
         if user_profile_serializer.is_valid():
             user_profile_serializer.save()
             return JsonResponse(user_profile_serializer.data, status=status.HTTP_201_CREATED) 
         return JsonResponse(user_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-#TODO-------------------------------------------------------------------°
-@api_view([ 'GET', 'DELETE'])
+@api_view(['GET'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
-def consult_reservation_by_id_card(request,pk):
-    try: 
-        consult = ConsultReservation.objects.get(pk=pk) 
-    except ConsultReservation.DoesNotExist: 
-        return JsonResponse({'message': 'consult does not exist'}, status=status.HTTP_404_NOT_FOUND) 
+def pacient_profile(request):
+    if request.method == 'GET':
+        try: 
+            username = JSONParser().parse(request) 
+            print("USERNAME  ", username)
+            user =  UserProfilee.objects.get(username=username["username"])
+            serializer = UserProfileeSerializer(user, many=False, context={"request": request})
+            return Response(serializer.data)
     
-    if request.method == 'GET': 
-            consults_data = JSONParser().parse(request) 
-            consult_serializer = ConsultReservationSerializer(consult, data=consults_data) 
-            if consult_serializer.is_valid(): 
-                consult_serializer.save() 
-                return JsonResponse(consult_serializer.data) 
-            return JsonResponse(consult_serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
- 
-    elif request.method == 'DELETE': 
-        consult.delete() 
-        return JsonResponse({'message': 'Consult was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        except UserProfilee.DoesNotExist: 
+            return UserProfilee({'message': 'consult does not exist'}, status=status.HTTP_200_OK) 
 
-    elif request.method == 'GET': 
-        consult.delete() 
-        return JsonResponse({'message': 'Consult was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def pacient_profile_by_id(request):
+
+    if request.method == 'GET':
+        try: 
+            data = JSONParser().parse(request) 
+            user =  UserProfilee.objects.get(id_card=data["id_card"])
+            serializer = UserProfileeSerializer(user, many=False, context={"request": request})
+            return Response(serializer.data)
+    
+        except UserProfilee.DoesNotExist: 
+            return UserProfilee({'message': 'consult does not exist'}, status=status.HTTP_200_OK)

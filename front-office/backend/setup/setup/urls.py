@@ -18,13 +18,12 @@ urlpatterns = [
     path("jwt/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("jwt/verify/", TokenVerifyView.as_view(), name="token_verify"),
     
-    #API https://www.bezkoder.com/django-rest-api/ 
     path("api/signup/", views.SignUpView.as_view()),
     path("api/login/", views.LoginView.as_view()),
     path('api/profile/', views.fill_profile),
+    path('api/pacient-profile/', views.pacient_profile),
+    path('api/pacient-profile-by-id/', views.pacient_profile_by_id),
 
-    path('api/consults/', views.consults),
-    #path('api/hosp-consult-reservation/<int:pk>/', views.consult_reservation_to_hospital)
 ]
 
 if settings.DEBUG:

@@ -34,6 +34,6 @@ class ConsultReservationForm(forms.Form):
     consult_date  = DateTimeLocalField()
     #pacient = forms.ChoiceField(choices=[(x.id, str(x.name) +  " --- ID CARD: " +  str(x.id_card)) for x in Pacient.objects.all()])
     #doctor = forms.ChoiceField(choices=[(x.id, str(x.name) + " --- " + "Specialization: " + str(x.specialization) + " --- ID CARD: " + str(x.id_card)) for x in doctors["doctors"]])
-    status = forms.ChoiceField( choices=(('WAITING','WAITING'),('ACCEPT','ACCEPT'), ('DONE','DONE')))
+    #status = forms.ChoiceField( choices=(('WAITING','WAITING')))
     description = forms.CharField(label="Description", max_length=450, required=True)
 

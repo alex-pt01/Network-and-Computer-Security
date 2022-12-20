@@ -43,8 +43,7 @@
 	<section style="width: 100%; height:auto"><!--form-->
         <p>
           
-            <a class="btn btn-sm btn-success" style="
-             float:right;margin-right:180px"  href="{% url 'consult-reservation' %}" > Create Consult </a>
+          
         
 
          </p>
@@ -55,12 +54,12 @@
                 <tr>
                     <th>scheduled_date</th>
                     <th>consult_date</th>
-                    <th>pacient_id_card</th>
-                    <th>Doctor first name</th>
-                    <th>Doctor last name</th>
-                    <th>Doctor specialization</th>
-
                     <th>doctor_id_card</th>
+
+                    <th>Pacient first name</th>
+                    <th>Pacient last name</th>
+
+                    <th>pacient_id_card</th>
 
 
                     <th style="color:#2a6496">status</th>
@@ -71,13 +70,12 @@
                     <tr>
                         <th>{{ consult.scheduled_date }}</th>
                         <th>{{ consult.consult_date }}</th>
-                        <th>{{ consult.pacient_id_card }}</th>
+                        <th>{{ consult.doctor_id_card }}</th>
                         <th>{{ consult.first_name }}</th>
                         <th>{{ consult.last_name }}</th>
-                        <th>{{ consult.specialization }}</th>
 
                         
-                        <th>{{ consult.doctor_id_card }}</th>
+                        <th>{{ consult.pacient_id_card }}</th>
 
                         <th style="color:#2a6496">{{ consult.status }}</th>
                         <th >{{ consult.description }}</th>

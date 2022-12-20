@@ -116,7 +116,7 @@ def profile(request):
                 context = {'username': request.session['username']}
                 return render(request, 'home.html', context)
         return render(request, 'profile.html', {'form': form})
-
+ 
 
 def logout(request):
     del request.session['token']
@@ -132,6 +132,7 @@ def home(request):
         return render(request, 'home.html', {})
 
 def consults(request):
+    print("CONSULTSSSSSS")
     print(request.session['token'])
     if 'token' in request.session and user_is_authenticated(request, request.session['token']):
 
@@ -139,33 +140,75 @@ def consults(request):
         "accept": "application/json",
         "Content-Type": "application/json",
         "Authorization": "Bearer " + request.session['token']
-        }            
+        }      
+        #GET pacient profile      
         params = { "username": request.session['username']}
-        response = requests.get(URL+'api/consults/',headers = headers,data=json.dumps(params) )
-        context = {'username': request.session['username'], "consults": response.json()}
+        pacient = requests.get(URL+'api/pacient-profile/',headers = headers,data=json.dumps(params) )
+        #Objetc -> enviar como json
+        print("PACIENT  ", pacient.json().get("id_card"))
+
+        #GET pacient consults
+        params_ = { "username": request.session['username'], "pacient_id_card": pacient.json().get("id_card")}
+        response = requests.get(URL_HOSPITAL+'api/pacient-consults/',headers = headers,data=json.dumps(params_) )
+        print("OOOOO")
+        print("RESPONSE ", response.json())
+        new_info = []
+        #GET doctor profile      
+        for obj in response.json():
+            print("OKK ", type(obj))
+            params_doct = { "username": request.session['username'], "id_card": obj.get("doctor_id_card")}
+            doctor_profile = requests.get(URL_HOSPITAL+'api/doctor-profile-by-id/',headers = headers,data=json.dumps(params_doct) )
+            print(doctor_profile.json().get("first_name"))
+            obj["first_name"]=doctor_profile.json().get("first_name")
+            obj["last_name"]=doctor_profile.json().get("last_name")
+            obj["specialization"]=doctor_profile.json().get("specialization")
+            new_info.append(obj)
+        print("NEWW!!!!! ", type(new_info))
+
+        print("NEWW ", type(new_info))
+
+        context = {'username': request.session['username'], "consults": new_info}
         return render(request, 'consults.html', context)
     else:
         context = {}
         return render(request, 'login.html', context)
 
 def consult_reservation(request):
-    print(request.session['token'])
+    headers = {
+    "accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + request.session['token']
+    }        
     if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+        if request.method == 'POST':
+            form = ConsultReservationForm(request.POST, request.FILES)
+            params = { "username": request.session['username']}
 
-        headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + request.session['token']
-        }            
-        params = { "username": request.session['username']}
-        response = requests.get(URL_HOSPITAL+'api/doctors/',headers = headers,data=json.dumps(params) )
-        context = {'username': request.session['username'], "doctors": response.json()}
-        print(context["doctors"])
-        return render(request, 'consult-reservation.html', context["doctors"])
+            if form.is_valid():
+                scheduled_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                consult_date = form.cleaned_data['consult_date']                
+                #GET pacient profile
+                pacient = requests.get(URL+'api/pacient-profile/',headers = headers,data=json.dumps(params) )
+                pacient_id_card = pacient.json().get("id_card")
+
+                doctor_id_card = request.POST['selec_doct']
+                status = "WAITING"
+                description = form.cleaned_data['description']
+                consult = {"scheduled_date":scheduled_date,"consult_date":consult_date,"pacient_id_card":pacient_id_card,"doctor_id_card":doctor_id_card,"status":status,"description":description  }
+                resp = requests.post(URL_HOSPITAL+'api/create-consult/', headers = headers ,data=json.dumps(consult,default=str))
+                context = {'username': request.session['username'] }
+                return render(request, 'home.html', context)
+
+
+        else:      
+            params = { "username": request.session['username']}
+            response = requests.get(URL_HOSPITAL+'api/doctors/',headers = headers,data=json.dumps(params) )
+            context = {'username': request.session['username'], "doctors": response.json(), 'form': ConsultReservationForm() }
+            return render(request, 'consult-reservation.html', context)
 
     else:
         context = {}
-        return render(request, 'home.html', context)
+        return render(request, 'login.html', context)
 
 
 """
