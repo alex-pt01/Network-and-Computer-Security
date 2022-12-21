@@ -28,30 +28,28 @@ class Consult(models.Model):
         return self.status
 
 
-class Room(models.Model):
-    number = models.IntegerField( blank=True, null=True)
-    floor = models.IntegerField( blank=True, null=True)
-    def __str__(self):
-        return "Floor: " + str(self.floor) + " --- Number: " + str(self.number)
+
 
 class ConsultRoomReservation(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    consult = models.ForeignKey(Consult, on_delete=models.CASCADE)
+    floor = models.IntegerField( blank=True, null=True)
+    room = models.IntegerField( blank=True, null=True)
+    consult_id = models.IntegerField( blank=True, null=True)
     def __str__(self):
-        return self.consult.doctor.specialization.name
+        return str(self.floor)
 
 
 class ExternalLabs(models.Model):
     pacient_id_card = models.IntegerField( blank=True, null=True)
     doctor_id_card = models.IntegerField( blank=True, null=True)
     lab_name = models.CharField(max_length=200)
-    consult_lab_date  = models.DateTimeField( blank=True, null=True)
-    form_update_date = models.DateTimeField(default=datetime.now, null=True)
+    consult_lab_date  = models.CharField( max_length=400)
+    form_update_date = models.CharField(max_length=400)
     intro = models.CharField(max_length=400)
     materials = models.CharField(max_length=400)
     procedure = models.CharField(max_length=400)
     results = models.CharField(max_length=400)
-    hash = models.CharField(max_length=2000)
+    hash = models.CharField(max_length=1000)
+
     def __str__(self):
         return self.lab_name
 

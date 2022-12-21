@@ -22,6 +22,8 @@ urlpatterns = [
     path("api/login/", views.LoginView.as_view()),
     path('api/profile/', views.fill_profile),
     path('api/pacient-profile/', views.pacient_profile),
+    path('api/pacients/', views.pacients),
+
     path('api/pacient-profile-by-id/', views.pacient_profile_by_id),
 
 ]

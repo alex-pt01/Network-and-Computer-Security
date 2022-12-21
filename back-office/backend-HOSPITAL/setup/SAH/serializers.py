@@ -48,21 +48,13 @@ class ConsultSerializer(serializers.ModelSerializer):
         model = Consult
         fields = ('id', 'scheduled_date', 'consult_date', 'pacient_id_card', 'doctor_id_card', 'status', 'description')
     
-
-class RoomSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Room
-        fields = ('id', 'number', 'floor')
-    
 class ConsultRoomReservationSerializer(serializers.ModelSerializer):
-    room = RoomSerializer
-    consult = ConsultSerializer
     class Meta:
-        model = Room
-        fields = ('id', 'room', 'consult')
+        model = ConsultRoomReservation
+        fields = ('id', 'floor', 'room', 'consult_id')
 
 class ExternalLabsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Consult
+        model = ExternalLabs
         fields = ('id', 'pacient_id_card', 'doctor_id_card', 'lab_name', 'consult_lab_date', 'form_update_date', 'intro', 'materials', 'procedure', 'results', 'hash')
     

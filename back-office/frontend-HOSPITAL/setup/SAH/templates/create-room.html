@@ -1,22 +1,37 @@
+
+
 {% extends "layout.html" %}
 {% block content %}
 	<section ><!--form-->
-    <div class="row">       
+    <div class="row">
 				<div class="col-sm-4 col-sm-offset-4" >
 
 					<div class="login-form"><!--login form-->
-						<h2>Create new room</h2>
+						<h2>Create new room reservation</h2>
 					    <form method="POST" action="." enctype= multipart/form-data>
 						    {% csrf_token %}
+      
+                            <label>Room:</label>
+                            {{ form.room }}
+                            <br>
 
-                            {{ form.as_p }}
+                            <label>Floor:</label>
+                            {{ form.floor }}
+                            <br>
+                            <label>Consult info</label>
 
-                                     
-                        
-                            <button style="float:right;" type="submit" class="btn btn-default">Create Room</button>
+							<select name="selec_consult" class="select" >
+                                {% for consult in consults %}
+                                    <option  value="{{consult.id}}">
+                                        {{consult.id}} --- {{consult.consult_date}}  ---  {{consult.status}}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button style="float:right;" type="submit" class="btn btn-default">Create</button>
 						</form>
 					</div><!--/login form-->
-				</div>
+
+                    
                 <br><br>
                 {% if error %}
                     <div class="alert alert-danger">
@@ -25,4 +40,5 @@
                 {% endif %}
 		</div>
 {% endblock %}
+
 

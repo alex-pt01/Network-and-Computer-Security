@@ -50,24 +50,43 @@
 
                 <table class="styled-table">
                 <tr>
+                    <th>Consult ID</th>
                     <th>Number</th>
                     <th>Floor </th>
-     
-                    <th>Update</th>
+                    <th>Consult date</th>
+                    <th style="color:red" >Status</th>
+
+                    <th style="color:orange">Pacient ID card</th>
+                    <th style="color:#2a6496">Doctor ID card</th>
+
                     <th>Remove</th>
            
                 </tr>
                 {% for room in rooms %}
                     <tr>
-                        <th>{{ room.number }}</th>
+                        <th>{{ room.consult_id }}</th>
+                        <th>{{ room.room }}</th>
                         <th>{{ room.floor }}</th>
-            
-                        <th><a class="btn btn-sm btn-info" href="{% url 'update-room' room.id %}">Update</a></th>
+                        <th>{{ room.consult_date }}</th>
+                        <th style="color:red"> {{ room.status }}</th>
+
+                        <th style="color:orange">{{ room.pacient_id_card }}</th>
+                        <th style="color:#2a6496" >{{ room.doctor_id_card }}</th>
+
                         <th><a class="btn btn-sm btn-danger" href="{% url 'deleteRoom' room.id %}">Delete</a></th>
 
                     </tr>
                 {%  endfor %}
                 </table>
+                <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>	<br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
         </div>
     </div>
 	</section>

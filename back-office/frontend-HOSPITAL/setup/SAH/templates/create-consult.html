@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
 	<section ><!--form-->
-    <div class="row">       
+    <div class="row">  
+ 
 				<div class="col-sm-4 col-sm-offset-4" >
 
 					<div class="login-form"><!--login form-->
@@ -14,10 +15,23 @@
 
                             
                             <label>Pacient:</label>
-                            {{ form.pacient }}
+                            <select name="selec_pac" class="select" >
+                                {% for pacient in pacients %}
+                                    <option  value="{{pacient.id_card}}">
+                                        {{pacient.first_name|capfirst}} {{pacient.last_name|capfirst}}  ---  {{pacient.id_card}}
+                                    </option>
+                                {% endfor %}
+                            </select>
                             <br>
+
                             <label>Doctor:</label>
-                            {{ form.doctor }}
+                            <select name="selec_doct" class="select" >
+                                {% for doctor in doctors %}
+                                    <option  value="{{doctor.id_card}}">
+                                        {{doctor.first_name|capfirst}} {{doctor.last_name|capfirst}}  ---  {{doctor.specialization|capfirst}} --- {{doctor.id_card}}
+                                    </option>
+                                {% endfor %}
+                            </select>
                             <br>
                             <label>Status:</label>
                             {{ form.status }}

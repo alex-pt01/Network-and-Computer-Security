@@ -7,7 +7,7 @@ username: adminsirs
 password: @adsirs123
 
 DOCTOR
-username: doctor5
+username: doctorAlex
 password: @sirs1234
 
 PACIENT
@@ -29,7 +29,7 @@ pip3 install djangorestframework
 pip3 install django-cors-headers
 pip3 install serializers
 pip3 install djangorestframework-simplejwt
-pip3 install localStoragePy
+pip3 install ratelimit
 ```
 
 **START working**

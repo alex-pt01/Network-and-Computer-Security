@@ -1,3 +1,4 @@
+from datetime import datetime
 from pyexpat.errors import messages
 from django.shortcuts import HttpResponseRedirect, redirect, render
 from rest_framework import generics, status
@@ -15,6 +16,10 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser 
 import json
 import requests
+from ratelimit import limits, RateLimitException, sleep_and_retry
+
+ONE_MINUTE = 60
+MAX_CALLS_PER_MINUTE = 300
 
 URL_HOSPITAL = "http://127.0.0.1:8004/"
 URL = "http://127.0.0.1:8002/"
@@ -47,6 +52,8 @@ def home(request):
     else:  
         return render(request, 'home.html', {})
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def login(request):
     print(request.session)
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
@@ -69,11 +76,16 @@ def login(request):
                     ACCESS_TOKEN_DICT[username] = str(tk)
                     request.session['token'] = str(tk)
                     request.session['username'] = username
+                    params = { "username": username }
+                    admin_data = requests.get(URL_HOSPITAL+'api/check-is-admin/', headers = HEADERS ,data=json.dumps(params))
+                    print("ttt   ", admin_data.json().get("admin"))
+                    request.session['admin'] = admin_data.json().get("admin")
+                    print("XXXXX ", request.session['admin'])
 
                     print('Success')
                     print(request.session['username'])
                     messages.success(request, 'Welcome!!! ')
-                    context = {'username': username}
+                    context = {'username': username, 'admin': request.session['admin']}
 
                     return render(request, 'home.html', context)
             except: 
@@ -82,6 +94,8 @@ def login(request):
         context = {}
         return render(request, 'login.html', context)
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def signup(request):
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         context = {'username': request.session['username']}
@@ -101,12 +115,16 @@ def signup(request):
                 return redirect('profile')
         return render(request, 'signup.html', {'form': form})
 
-def logout(request):
+def logout(request):    
+    print("DDDDDD")
     del request.session['token']
     del request.session['username']
+    #del request.session['admin']
     context = {}
     return render(request, 'home.html', context)
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def profile(request):
     headers = {
         "accept": "application/json",
@@ -133,7 +151,8 @@ def profile(request):
         return render(request, 'profile.html', {'form': form})
 
 
-
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def doctor_consults(request):
 
     print("CONSULTSSSSSS")
@@ -177,7 +196,8 @@ def doctor_consults(request):
         context = {}
         return render(request, 'login.html', context)
 
-
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def consults_management(request):
     print("CONSULTS MANAGEMENT")
     print(request.session['token'])
@@ -224,429 +244,243 @@ def deleteConsult(request, id):
         "Authorization": "Bearer " + request.session['token']
         }     
         params = { "username": request.session['username']}
-        resp = requests.post(URL_HOSPITAL+'api/deleteConsult/', headers = HEADERS ,data=json.dumps(params))
+        resp = requests.delete(URL_HOSPITAL+'api/hosp-consult/'+id, headers = HEADERS ,data=json.dumps(params))
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def update_consult(request,id):
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-"""
-def consults(request):
-    print(request.session['token'])
+    print("IIID ", id)
+    headers = {
+    "accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + request.session['token']
+    }        
     if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+        if request.method == 'POST':
+            form = ConsultForm(request.POST, request.FILES)
+            params = { "username": request.session['username']}
 
-        headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + request.session['token']
-        }            
-        params = { "username": request.session['username']}
-        response = requests.get(URL_HOSPITAL+'api/consults/',headers = headers,data=json.dumps(params) )
-        context = {'username': request.session['username'], "consults": response.json()}
-        return render(request, 'consults.html', context)
+            if form.is_valid():
+                params_id_cons = { "username": request.session['username'], "id": id}
+                consult_data = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_id_cons) )
+                print("FFF ", consult_data.json().get("scheduled_date"))
+                scheduled_date = consult_data.json().get("scheduled_date")
+                consult_date = form.cleaned_data['consult_date']                
+                pacient_id_card = consult_data.json().get("pacient_id_card")
+                doctor_id_card = consult_data.json().get("doctor_id_card")
+                description = consult_data.json().get("description")
+                status = form.cleaned_data['status']
+
+                consult = {"scheduled_date":scheduled_date,"consult_date":consult_date,"pacient_id_card":pacient_id_card,"doctor_id_card":doctor_id_card,"status":status,"description":description  }
+                
+                resp = requests.put(URL_HOSPITAL+'api/hosp-consult/'+id, headers = headers ,data=json.dumps(consult,default=str))
+                context = {'username': request.session['username'] }
+                return render(request, 'home.html', context)
+
+
+        else:      
+            print("DDDD ",id )
+            params_id_cons = { "username": request.session['username'], "id": id}
+            consult_data = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_id_cons) )
+            context = {'username': request.session['username'], "consult": consult_data.json(), 'form': ConsultForm() }
+            return render(request, 'update-consult.html', context)
+
     else:
         context = {}
         return render(request, 'login.html', context)
 
-def home(request):
-    if 'username' in request.session:
-        context = {'username': request.session['username']}
-        return render(request, 'home.html', context)
-    else:  
-        return render(request, 'home.html', {})
-"""
-
-
-
-"""
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def create_consult(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    headers = {
+    "accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + request.session['token']
+    }        
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
         if request.method == 'POST':
-            form = ConsultForm(request.POST, request.FILES)
+            form = ConsultReservationForm(request.POST, request.FILES)
+            params = { "username": request.session['username']}
+
             if form.is_valid():
-                consult = Consult()
-                consult.scheduled_date = datetime.now()
-                consult.consult_date = form.cleaned_data['consult_date']
-                consult.pacient = Pacient.objects.get(id=form.cleaned_data['pacient'])
-                #consult.doctor = Doctor.objects.get(id=form.cleaned_data['doctor'])
-                consult.description = form.cleaned_data['description']
-                consult.status = form.cleaned_data['status']
-                consult.save()
-                return redirect('consults-management')
-            else:
-                print(form.errors)
-        else:
-            form = ConsultForm()
-        return render(request, 'create-consult.html', {'form': form})
-    return redirect('login')
+                scheduled_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                consult_date = form.cleaned_data['consult_date']                
+                #GET pacient profile
+                #pacient = requests.get(URL+'api/pacient-profile/',headers = headers,data=json.dumps(params) )
+                pacient_id_card = request.POST['selec_pac']
 
-"""
-
-
-
-
-
-
-    
-
-"""
-def update_consult(request,id):
-    consult = Consult.objects.get(id=id)
-    if request.method == "POST":
-        form = ConsultForm(request.POST)
-        if form.is_valid():
-            consult.scheduled_date = datetime.now()
-            consult.consult_date = form.cleaned_data['consult_date']
-            consult.pacient = Pacient.objects.get(id=form.cleaned_data['pacient'])
-            #consult.doctor = Doctor.objects.get(id=form.cleaned_data['doctor'])
-            consult.description = form.cleaned_data['description']
-            consult.status = form.cleaned_data['status']
-            consult.save()
-            return redirect('consults-management')
+                doctor_id_card = request.POST['selec_doct']
+                status = form.cleaned_data['status']   
+                description = form.cleaned_data['description']
+                
+                consult = {"scheduled_date":scheduled_date,"consult_date":consult_date,"pacient_id_card":pacient_id_card,"doctor_id_card":doctor_id_card,"status":status,"description":description  }
+                resp = requests.post(URL_HOSPITAL+'api/create-consult/', headers = headers ,data=json.dumps(consult,default=str))
+                context = {'username': request.session['username'] }
+                return render(request, 'home.html', context)
+        else:      
+            params = { "username": request.session['username']}
+            response_doct = requests.get(URL_HOSPITAL+'api/doctors/',headers = headers,data=json.dumps(params) )
+            response_pac = requests.get(URL+'api/pacients/',headers = headers,data=json.dumps(params) )
+            context = {'username': request.session['username'], "doctors": response_doct.json(),"pacients": response_pac.json(),  'form': ConsultReservationForm() }
+            return render(request, 'create-consult.html', context)
     else:
-        form = ConsultForm(initial={"scheduled_date": consult.scheduled_date,
-                                      "consult_date": consult.consult_date,
-                                      "pacient": consult.pacient,
-                                      "doctor": consult.doctor,
-                                      "status":consult.status,
-                                      "description":consult.description
-                                      })
-    return render(request, "update-consult.html", {"form": form})
+        context = {}
+        return render(request, 'login.html', context)
 
+#---------------------------------------------------------------
+#Consults room reservation
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def rooms_management(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-        return render(request, 'rooms-management.html', {'rooms': Room.objects.all()})
-    return redirect('login')
+    print("ROOMS MANAGEMENT")
+    print(request.session['token'])
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }     
+        params = { "username": request.session['username']}
+        print("HHHHHHHHHHH")
+        rooms = requests.get(URL_HOSPITAL+'api/all-room-reservations/',headers = headers,data=json.dumps(params) )
+        print(rooms.json())
+        new_info = []
+        for obj in rooms.json():
+            print("OKK ", obj)
+            print(type(obj.get("consult_id")))
+            params_consult = { "username": request.session['username'], "id": obj.get("consult_id")}
 
+            consult = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_consult) )
+            print(consult.json())
+            obj["consult_date"]=consult.json().get("consult_date")
+            obj["pacient_id_card"]=consult.json().get("pacient_id_card")
+            obj["doctor_id_card"]=consult.json().get("doctor_id_card")
+            obj["status"]=consult.json().get("status")
+            new_info.append(obj)
+        print("BBB ", new_info)
+        context = {'username': request.session['username'], "rooms": new_info}
+        return render(request, 'rooms-management.html', context)
+
+    else:
+        context = {}
+        return render(request, 'login.html', context)
+
+
+
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def deleteRoom(request, id):
-    room = Room.objects.get(id=id)
-    room.delete()
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }     
+        params = { "username": request.session['username']}
+        resp = requests.delete(URL_HOSPITAL+'api/del-room/'+id, headers = HEADERS ,data=json.dumps(params))
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def update_room(request,id):
-    room = Room.objects.get(id=id)
-    if request.user.is_authenticated and request.user.is_superuser:
-        if request.method == "POST":
-            form = RoomForm(request.POST)
-            if form.is_valid():
-                room.number = form.cleaned_data['number']
-                room.floor = id=form.cleaned_data['floor']
-                room.save()
-                return redirect('rooms-management')
-        else:
-            form = RoomForm(initial={"number": room.number,
-                                        "floor": room.floor,
-                                        })
-                     
-        return render(request, "update-room.html", {"form": form})    
-    return redirect('login')
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def create_room(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    headers = {
+    "accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + request.session['token']
+    }        
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
         if request.method == 'POST':
             form = RoomForm(request.POST, request.FILES)
+            params = { "username": request.session['username']}
+            print("FFFF") 
+            print(form)
             if form.is_valid():
-                room = Room()
-                room.number = form.cleaned_data['number']
-                room.floor = id=form.cleaned_data['floor']
-                room.save()
-                return redirect('rooms-management')
+                print("SSSSSSS")
+                consult_id = request.POST['selec_consult']   
+                floor = form.cleaned_data['floor'] 
+                print("YYYYY ", type(floor))  
+                room = form.cleaned_data['room']
+                
+                room_data = {"floor":floor,"room":room,"consult_id":consult_id }
+                resp = requests.post(URL_HOSPITAL+'api/create-room-reservation/', headers = headers ,data=json.dumps(room_data))
+                context = {'username': request.session['username'] }
+                return render(request, 'home.html', context)
             else:
-                print(form.errors)
-        else:
-            form = RoomForm()
-        return render(request, 'create-room.html', {'form': form})
-    return redirect('login')
+                params = { "username": request.session['username']}
+                response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) )
+                context = {'username': request.session['username'], 'consults': response_consult.json(), 'form': RoomForm() }
+                return render(request, 'create-room.html', context)
+        else:      
+            params = { "username": request.session['username']}
 
+            response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) )
+            print(response_consult.json())
+            context = {'username': request.session['username'], 'consults': response_consult.json(), 'form': RoomForm() }
+            return render(request, 'create-room.html', context)
+    else:
+        context = {}
+        return render(request, 'login.html', context)
 
+#External Labs------------------------
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
+def external_labs_info(request):
+    print("EXTERNAL MANAGEMENT")
+    print(request.session['token'])
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }     
+        params = { "username": request.session['username']}
+        print("RRRRR")
+        external_labs = requests.get(URL_HOSPITAL+'api/external-labs/',headers = headers,data=json.dumps(params) )
+        print(external_labs.json())        
+        context = {'username': request.session['username'], "externalLabs": external_labs.json()}
+        return render(request, 'external-lab-info.html', context)
+    else:
+        context = {}
+        return render(request, 'login.html', context)
 
-def room_consult_management(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-        return render(request, 'room-consult-management.html', {'consultRoomReservations': ConsultRoomReservation.objects.all()})
-    return redirect('login')
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
+def deleteExternalLab(request, id):
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }     
+        params = { "username": request.session['username']}
+        resp = requests.delete(URL_HOSPITAL+'api/del-external-lab/'+id, headers = HEADERS ,data=json.dumps(params))
 
-def create_room_consult(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-        if request.method == 'POST':
-            form = ConsultRoomReservationForm(request.POST, request.FILES)
-            if form.is_valid():
-                consultReservationForm = ConsultRoomReservation()
-                consultReservationForm.room = Room.objects.get(id=form.cleaned_data['room'])
-                consultReservationForm.consult = Consult.objects.get(id=form.cleaned_data['consult'])
-
-                consultReservationForm.save()
-                return redirect('room-consult-management')
-            else:
-                print(form.errors)
-        else:
-            form = ConsultRoomReservationForm()
-        return render(request, 'create-room-consult.html', {'form': form})
-    return redirect('login')
-
-def deleteRoomConsult(request, id):
-    consultReservation = ConsultRoomReservation.objects.get(id=id)
-    consultReservation.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def update_room_consult(request,id):
-    assert isinstance(request, HttpRequest)
-    consultReservationForm = ConsultRoomReservation.objects.get(id=id)
-
-    if request.user.is_authenticated and request.user.is_superuser:
-
-        if request.method == "POST":
-            form = ConsultRoomReservationForm(request.POST)
-            if form.is_valid():
-                consultReservationForm.room = Room.objects.get(id=form.cleaned_data['room'])
-                consultReservationForm.consult = Consult.objects.get(id=form.cleaned_data['consult'])
-                consultReservationForm.save()
-                return redirect('room-consult-management')
-        else:
-            form = ConsultRoomReservationForm(initial={"room": consultReservationForm.room,
-                                        "consult": consultReservationForm.consult,
-                                
-                                        })
-                                        
-        return render(request, "update-room-consult.html", {"form": form})    
-    return redirect('login')
-"""
-
-
-"""
-def external_lab_info(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-        externalLabs = ExternalLabs.objects.all()
-        return render(request, "external-lab-info.html", {"externalLabs": externalLabs})    
-    return redirect('login')
-
-def create_external_lab_info(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-        if request.method == 'POST':
-            form = ExternalLabsForm(request.POST, request.FILES)
-            if form.is_valid():
-                externalLabs = ExternalLabs()
-                externalLabs.pacient = Pacient.objects.get(id=form.cleaned_data['pacient'])
-                #externalLabs.doctor = Doctor.objects.get(id=form.cleaned_data['doctor'])
-                externalLabs.lab_name = form.cleaned_data['lab_name']
-                externalLabs.consult_lab_date = form.cleaned_data['consult_lab_date']
-                externalLabs.form_update_date = datetime.now()
-                externalLabs.intro = form.cleaned_data['intro']
-                externalLabs.materials = form.cleaned_data['materials']
-                externalLabs.procedure = form.cleaned_data['procedure']
-                externalLabs.results = form.cleaned_data['results']
-                externalLabs.hash = form.cleaned_data['hash']
-                externalLabs.save()
-
-                return redirect('external-lab-info')
-            else:
-                print(form.errors)
-        else:
-            form = ExternalLabsForm()
-        return render(request, 'create-external-lab-info.html', {'form': form})
-    return redirect('login')
-"""
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-def delete_user(request, id):
-    user = User.objects.get(id=id)
-    user.delete()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-def update_user(request):
-    tparams = {}
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = updateUserForm(request.POST)
-            if form.is_valid():
-                data = form.cleaned_data
-                username = data['username']
-                email = data['email']
-                curPass = data['currentPassword']
-                newPass = data['newPassword']
-                newRepeatedPass = data['repeatNewPassword']
-                firstName = data['first_name']
-                lastName = data['last_name']
-                if newPass != newRepeatedPass:
-                    form = updateUserForm()
-                    tparams['form'] = form
-                    tparams['error'] = "Inserted Passwords Are Not The Same"
-                    return render(request, 'update-user.html', tparams)
-                if request.user.check_password(curPass):
-
-                    user = request.user
-                    user.username = username
-                    user.first_name = firstName
-                    user.last_name = lastName
-                    user.email = email
-                    user.set_password(raw_password=newPass)
-                    user.save()
-                else:
-                    form = updateUserForm()
-                    tparams['form'] = form
-                    tparams['error'] = "Incorrect Password"
-                    return render(request, 'update-user.html', tparams)
-                return redirect('login')
-        else:
-            form = updateUserForm()
-        tparams['form'] = form
-        return render(request, 'update-user.html', tparams)
-    return redirect('login')
-
-
-
-def doctor_signup(request):
-    if not request.user.is_superuser:
-        if request.method == 'POST':
-            form = DoctorForm(request.POST, request.FILES)
-            if form.is_valid():
-                doct = Doctor(user = User.objects.all().last(),
-                specialization = Specialization.objects.get(id= form.cleaned_data['specialization']),
-                gender= form.cleaned_data['gender'],
-                name = form.cleaned_data['name'], 
-                address = form.cleaned_data['address'],
-                phone_number = form.cleaned_data['phone_number'],
-                birth_date = form.cleaned_data['birth_date'],
-                id_card = form.cleaned_data['id_card'],
-                )
-                doct.save()
-                return redirect('home')
-            else:
-                print(form.errors)
-        else:
-            form = DoctorForm()
-        return render(request, 'doctor-signup.html', {'form': form})
-    return redirect('login')
-
-"""
-
-
-"""
-def account(request):
-    if request.user.is_authenticated:
-
-        if Doctor.objects.filter(user_id=request.user.id).exists():
-            print("DOCTOR")
-            doctor = Doctor.objects.get(user_id=request.user.id)
-            return render(request, 'account.html', {"user_type": "D", "doctor" : doctor})
-        else:
-            if request.user.is_superuser:
-                return redirect('account')
-    return redirect('login')
-
-def update_doctor(request, doctor_id):
-    if request.user.is_authenticated:
-        doctor = Doctor.objects.get(id=doctor_id)
-        if request.method == 'POST':
-            form = DoctorForm(request.POST)
-            if form.is_valid():
-                doctor.specialization = Specialization.objects.get(id=form.cleaned_data['specialization'])
-                doctor.gender= form.cleaned_data['gender']
-                doctor.name = form.cleaned_data['name']
-                doctor.address = form.cleaned_data['address']
-                doctor.phone_number = form.cleaned_data['phone_number']
-                doctor.birth_date = form.cleaned_data['birth_date']
-                doctor.id_card = form.cleaned_data['id_card']
-                doctor.save()
-                return redirect("home")
-        else:
-            form = DoctorForm(initial={
-                    "specialization": doctor.specialization,
-                                        "gender": doctor.gender,
-                                        "name": doctor.name,
-                                        "address": doctor.address,
-                                        "phone_number": doctor.phone_number,
-                                        "birth_date": doctor.birth_date,
-                                        "id_card": doctor.id_card,
-                                        })             
-        return render(request, "update-doctor.html", {"form": form})
-"""
-
-
-"""
-def users_management(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-        pacients = Pacient.objects.all()
-        doctors = Doctor.objects.all()
-        return render(request, 'user-management.html', {"pacients": pacients, "doctors" : doctors})
-    return redirect('login')
-
-def deletePacient(request, id):
-    pacient = Pacient.objects.get(id=id)
-    pacient.delete()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-def deleteDoctor(request, id):
-    doctor = Doctor.objects.get(id=id)
-    doctor.delete()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-"""
-
-
-"""
-class SignUpView(generics.GenericAPIView):
-    serializer_class = SignUpSerializer
-    permission_classes = []
-
-    def post(self, request: Request):
-        if request.user.is_authenticated:
-            messages.info(request, 'You are already registered')
-            return redirect('home')
-        else:
-            form = newUserForm(request.POST)
-            if form.is_valid():
-                form.save()
-                user = form.cleaned_data.get('username')
-                messages.success(request, 'Account was created for ' + user)
-                return redirect('doctor-signup')
-            return render(request, 'signup.html', {'form': form}, status=status.HTTP_400_BAD_REQUEST )
-
-    def get(self, request: Request):
-        if request.user.is_authenticated:
-            messages.info(request, 'You are already registered')
-            return redirect('home')
-        else:
-            form = newUserForm()
-            return render(request, 'signup.html', {'form': form})
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
+def external_labs_by_doctor_id_card(request):
+    print("external_labs_by_doctor_id_card ")
+    print(request.session['token'])
+    if 'token' in request.session and user_is_authenticated(request, request.session['token']):
+        headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + request.session['token']
+        }     
+        params = { "username": request.session['username']}
+        response_doct = requests.get(URL_HOSPITAL+'api/doctor-profile/',headers = headers,data=json.dumps(params) )
+        print("RRRRR", response_doct.json().get("id_card"))
         
-
-class LoginView(APIView):
-    permission_classes = []
-    def post(self, request: Request):
-        username = request.POST.get('user')
-        password = request.POST.get('pass')
-
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            tokens = create_jwt_pair_for_user(user)
-            response = {"message": "Login Successfull", "tokens": tokens}
-            return render(request, 'home.html', response, status=status.HTTP_200_OK)
-        else:
-            return render(request, 'login.html', {"message": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST )
-
-    def get(self, request: Request):
-        if request.user.is_authenticated:
-            messages.info(request, 'You are already registered')
-            return redirect('home')
-        else:
-            context = {}
-            return render(request, 'login.html', context)
-"""
+        params_ = { "username": request.session['username'], "doctor_id_card": response_doct.json().get("id_card") }
+        external_labs = requests.get(URL_HOSPITAL+'api/external-labs-by-doct_id_card/',headers = headers,data=json.dumps(params_) )
+        print(external_labs.json())        
+        context = {'username': request.session['username'], "externalLabs": external_labs.json()}
+        return render(request, 'external-lab-info-doctor.html', context)
+    else:
+        context = {}
+        return render(request, 'login.html', context)

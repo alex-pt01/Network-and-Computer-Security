@@ -5,6 +5,5 @@ from SAH.models import *
 
 
 admin.site.register(Consult)
-admin.site.register(Room)
 admin.site.register(ConsultRoomReservation)
 admin.site.register(DoctorProfilee)

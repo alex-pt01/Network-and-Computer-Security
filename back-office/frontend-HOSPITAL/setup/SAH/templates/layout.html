@@ -48,7 +48,7 @@
 
                                 {% if 'token' in request.session %}
 								    <li><a style="background-color: #2a6496; color: white"  href="" > Welcome, {{ username }}</a></li>
-                                    <li ><a style="background-color: #2a6496; color:white"  href=""><i class="icon-signout"></i>Logout </a></li>
+                                    <li ><a style="background-color: #2a6496; color:white"  href="{% url 'logout' %}"><i class="icon-signout"></i>Logout </a></li>
                                 {% else %}
 								    <li><a style="background-color: #2a6496; color:white" href="{% url 'login' %}" ><i class="fa fa-sign-in" aria-hidden="true"></i>Login</a></li>
                                 {%  endif %}
@@ -67,14 +67,20 @@
     
                             <div class="mainmenu  col-sm-12  pull-left" >
                                 <ul style="float:left" class="nav navbar-nav collapse navbar-collapse">
+                                    {% if admin %}
 
-                                    <li><a href="{% url "home" %}" >Home</a></li>
-                                    <li><a href="{% url "consults-management" %}" >Consults Management</a></li>
-                                  
-                              
+                                        <li><a href="{% url "home" %}" >Home</a></li>
+                                        <li><a href="{% url "consults-management" %}" >Consults Management</a></li>
+                                        <li><a href="{% url "rooms-management" %}" >Rooms Management</a></li>
+                                        <li><a href="{% url "external-labs-info" %}" >External Labs Info</a></li>
 
-                                    <li><a href="{% url "home" %}" >Home</a></li>
-                                    <li><a href="{% url "doctor-consults" %}" >Consults</a></li>
+                                    {% else %}
+
+
+                                        <li><a href="{% url "home" %}" >Home</a></li>
+                                        <li><a href="{% url "doctor-consults" %}" >Consults</a></li>
+                                        <li><a href="{% url "external-labs-info-doctor" %}" >Doctor - External Labs </a></li>
+                                    {%  endif %}
 
                                   
 

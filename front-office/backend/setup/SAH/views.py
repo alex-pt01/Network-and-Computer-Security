@@ -129,3 +129,15 @@ def pacient_profile_by_id(request):
     
         except UserProfilee.DoesNotExist: 
             return UserProfilee({'message': 'consult does not exist'}, status=status.HTTP_200_OK)
+
+@api_view([ 'GET'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def pacients(request):
+    try: 
+        pacient = UserProfilee.objects.all()
+        pacient_serializer = UserProfileeSerializer(pacient, many=True)
+        return Response(pacient_serializer.data)
+    except UserProfilee.DoesNotExist: 
+        return JsonResponse({'message': 'pacient does not exist'}, status=status.HTTP_200_OK) 
+

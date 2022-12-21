@@ -8,9 +8,10 @@ from time import strptime
 from datetime import datetime
 import json
 import requests
-from localStoragePy import localStoragePy
+from ratelimit import limits, RateLimitException, sleep_and_retry
 
-localStorage = localStoragePy('SAH-frontend', 'SAH-backend')
+ONE_MINUTE = 60
+MAX_CALLS_PER_MINUTE = 300
 
 URL = "http://127.0.0.1:8002/"
 URL_HOSPITAL = "http://127.0.0.1:8004/"
@@ -22,7 +23,8 @@ HEADERS = {
 }
 
 ACCESS_TOKEN_DICT = {}
-
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def user_is_authenticated(request, token):
     params = { "token": token }
 
@@ -38,7 +40,8 @@ def user_is_authenticated(request, token):
         return False
     
 
-
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def login(request):
     print(request.session)
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
@@ -76,6 +79,8 @@ def login(request):
         context = {}
         return render(request, 'login.html', context)
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def signup(request):
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         messages.info(request, 'You are already registered')
@@ -96,7 +101,8 @@ def signup(request):
                 return redirect('profile')
         return render(request, 'signup.html', {'form': form})
 
-
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def profile(request):
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         messages.info(request, 'You are already registered')
@@ -131,6 +137,8 @@ def home(request):
     else:  
         return render(request, 'home.html', {})
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def consults(request):
     print("CONSULTSSSSSS")
     print(request.session['token'])
@@ -173,6 +181,8 @@ def consults(request):
         context = {}
         return render(request, 'login.html', context)
 
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def consult_reservation(request):
     headers = {
     "accept": "application/json",
@@ -210,28 +220,3 @@ def consult_reservation(request):
         context = {}
         return render(request, 'login.html', context)
 
-
-"""
-def consult_reservation(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = ConsultPacientForm(request.POST, request.FILES)
-            if form.is_valid():
-                consult = ConsultReservation()
-                consult.scheduled_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                consult.consult_date = form.cleaned_data['consult_date']
-                consult.pacient = Pacient.objects.get(user__pk=request.user.id)
-                consult.doctor = Doctor.objects.get(id=form.cleaned_data['doctor'])
-                consult.description = form.cleaned_data['description']
-                consult.status = "WAITING"
-                consult.save()
-                return redirect('consults')
-            else:
-                print("USER ID  ", Pacient.objects.get(user__pk=request.user.id).id)
-                print(form.errors)
-        else:
-            form = ConsultPacientForm()
-        return render(request, 'consult-reservation.html', {'form': form})
-    return redirect('login')
-
-"""

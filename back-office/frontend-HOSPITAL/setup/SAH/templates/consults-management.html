@@ -44,13 +44,17 @@
  
         <div   >
                 <div   >
+                    <a class="btn btn-sm btn-success" style="
+                    float:right;margin-right:180px"  href="{% url 'create-consult' %}" > Create Consult </a>    
 
                 <table class="styled-table">
                 <tr>
+                    <th>CONSULT ID</th>
+
                     <th>To</th>
                     <th>From</th>
                     <th>Description</th>
-                    <th>Status</th>
+                    <th style="color:red">Status </th>
                     <th style="color:orange">Pacient first name</th>
                     <th style="color:orange">Pacient last name</th>
 
@@ -67,10 +71,12 @@
                 </tr>
                 {% for consult in consults %}
                     <tr>
+                        <th>{{ consult.id }}</th>
+
                         <th>{{ consult.consult_date }}</th>
                         <th>{{ consult.scheduled_date }}</th>
                         <th>{{ consult.description }}</th>
-                        <th>{{ consult.status }}</th>
+                        <th style="color:red">{{ consult.status }}</th>
 
                  
                         <th style="color:orange">{{ consult.first_name_pacient }}</th>
@@ -90,6 +96,15 @@
                     </tr>
                 {%  endfor %}
                 </table>
+                <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>	<br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
         </div>
     </div>
 	</section>

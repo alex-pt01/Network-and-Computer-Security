@@ -28,45 +28,15 @@ urlpatterns = [
     path('consults-management/', views.consults_management, name='consults-management'),
     path('deleteConsult/<str:id>', views.deleteConsult, name='deleteConsult'),
     path('update-consult/<str:id>/', views.update_consult, name='update-consult'),
+    path('create-consult/', views.create_consult, name='create-consult'),
 
+    path('rooms-management/', views.rooms_management, name='rooms-management'),
+    path('deleteRoom/<str:id>', views.deleteRoom, name='deleteRoom'),
+    path('create-room/', views.create_room, name='create-room'),
 
-
-    #path('api/doct-consults/<str:doctor_id_card>', views.doctor_consults),
-    #path('api/hosp-consults/', views.hospital_consults),
-    #path('api/room/', views.room),
-    #path('api/room_consult/', views.room_consult),
-    #path('api/external_lab/', views.external_lab),
-
-
-
-
-    #templates
- 
-    #path('login/', views.login, name='login'),
-    #path('signup/', views.signup, name='signup'),
-    #path('logout/', views.logout, name='logout'),
-    
-    #path('consults-management/', views.consults_management, name='consults-management'),
-    #path('create-consult/', views.create_consult, name='create-consult'),
-    #path('deleteConsult/<str:id>', views.deleteConsult, name='deleteConsult'),
-    #path('update-consult/<str:id>/', views.update_consult, name='update-consult'),
-    
-    #path('rooms-management/', views.rooms_management, name='rooms-management'),
-    #path('deleteRoom/<str:id>', views.deleteRoom, name='deleteRoom'),
-    #path('update-room/<str:id>/', views.update_room, name='update-room'),
-    #path('create-room/', views.create_room, name='create-room'),
-
-    #path('room-consult-management/', views.room_consult_management, name='room-consult-management'),
-    #path('create-room-consult/', views.create_room_consult, name='create-room-consult'),
-    #path('deleteRoomConsult/<str:id>', views.deleteRoomConsult, name='deleteRoomConsult'),
-    #path('update-room-consult/<str:id>/', views.update_room_consult, name='update-room-consult'),
-
-    #path('doctor-info/<str:id>/', views.doctor_info, name='doctor-info'),
-    #path('pacient-info/<str:id>/', views.pacient_info, name='pacient-info'),
-
-    #path('external-lab-info/', views.external_lab_info, name='external-lab-info'),
-    #path('create-external-lab-info/', views.create_external_lab_info, name='create-external-lab-info'),
-
+    path('external-labs-info/', views.external_labs_info, name='external-labs-info'),
+    path('deleteExternalLab/<str:id>', views.deleteExternalLab, name='deleteExternalLab'),
+    path('external-labs-info-doctor/', views.external_labs_by_doctor_id_card, name='external-labs-info-doctor'),
 
 ]
 
