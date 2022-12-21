@@ -21,7 +21,7 @@ from ratelimit import limits, RateLimitException, sleep_and_retry
 ONE_MINUTE = 60
 MAX_CALLS_PER_MINUTE = 300
 
-URL_HOSPITAL = "http://127.0.0.1:8004/"
+URL_HOSPITAL = "http://192.168.1.4:8003/"
 URL = "http://127.0.0.1:8002/"
 
 HEADERS = {
@@ -84,7 +84,6 @@ def login(request):
 
                     print('Success')
                     print(request.session['username'])
-                    messages.success(request, 'Welcome!!! ')
                     context = {'username': username, 'admin': request.session['admin']}
 
                     return render(request, 'home.html', context)
@@ -129,7 +128,6 @@ def profile(request):
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + request.session['token']
     }      
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         messages.info(request, 'You are already registered')
