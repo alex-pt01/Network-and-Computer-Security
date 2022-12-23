@@ -8,14 +8,15 @@ serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
 
 # Bind and listen
 #serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-serverSocket.bind(("192.168.1.4",8002));
+serverSocket.bind(("192.168.1.4",8002))
 
-serverSocket.listen();
+serverSocket.listen()
 
 # Accept connections
 while(True):
 
-    (clientConnected, clientAddress) = serverSocket.accept();
+    print("WAITING")
+    (clientConnected, clientAddress) = serverSocket.accept()
 
     print("Accepted a connection request from %s:%s"%(clientAddress[0], clientAddress[1]));
 
@@ -34,7 +35,7 @@ while(True):
     
     
     # Send the certificate, TS and nonce to the client
-    clientConnected.send(certificado);
+    clientConnected.send(certificado)
     
     
     dataFromClient = clientConnected.recv(2048)
@@ -42,7 +43,5 @@ while(True):
     with open('server.crt','w') as f:
     	f.write(dataFromClient.decode())
     
-    
-    
-    
+    break
     

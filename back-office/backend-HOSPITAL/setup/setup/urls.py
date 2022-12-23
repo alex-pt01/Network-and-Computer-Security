@@ -50,6 +50,9 @@ urlpatterns = [
     path('api/external-labs-by-doct_id_card/', views.external_labs_by_doctor_id_card),
 
 
+    #Protocol
+    path('protocol/hello/', views.hello),    
+    path('protocol/dh/', views.DH),    
 
 
 

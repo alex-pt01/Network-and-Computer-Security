@@ -21,9 +21,13 @@ from django.http.response import JsonResponse
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 import json
 from rest_framework.parsers import JSONParser 
-
+from .DH import DH_Endpoint
 
 User = get_user_model()
+
+#prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 17624813, 37139213, 50728129, 77557187, 131807699, 174440041, 259336153, 326851121, 368345293, 440817757, 563167303, 718064159, 751783477, 997525853, 1107276647, 1170710369, 1367161723,52711, 648391, 9737333, 37139213, 174440041, 326851121, 718064159, 997525853, 1559861749, 2724711961, 3657500101, 5545806481, 7069067389, 8012791231, 9672485827, 12501968177, 16123689073, 16917026909, 22742734291,709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 14161729, 17624813, 19734581, 23391799, 29499439, 37139213, 38790341, 50728129, 56011909, 59053067, 68425619, 77557187, 87019979, 101146501, 113256643, 119535373, 127065427,	648391, 9737333, 174440041, 718064159, 3657500101, 7069067389, 16123689073, 22742734291, 36294260117, 64988430769, 88362852307, 136395369829, 175650481151, 200147986693, 243504973489, 318083817907, 414507281407]
+prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 52711, 648391, 9737333, 709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 648391, 9737333, 15299, 87803, 219613, 318211, 506683, 919913, 1254739, 1471343, 1828669, 2364361, 3338989, 3509299, 4030889, 5054303, 5823667, 6478961, 6816631, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
+
 
 def create_jwt_pair_for_user(user: User):
     refresh = RefreshToken.for_user(user)
@@ -336,16 +340,142 @@ def check_is_admin(request):
         else:
             return Response({"admin": False}, status=status.HTTP_200_OK)
 
+import subprocess
+from datetime import datetime
+from OpenSSL import crypto    
+import secrets
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import dh
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+dic_external_labs={}
+
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def hello(request):
+    if 'certificate' in request.data and 'name' in request.data :
+        certificate=(request.data.get("certificate"))
+        name =(request.data.get("name"))
+        with open(name,'w') as f:
+    	    f.write(certificate)
+        #now check certificate 
+        verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+        output = subprocess.check_output(verify, shell=True)
+        outputStr = str(output.decode())
+
+        ## contruir e destruir 
+        expected_res=name + ": OK" 
+        if outputStr.rstrip()  == expected_res :
+            print("CERTIFICADO ACEITE")
+            #openssl x509 -pubkey -noout -in keys/server.crt #validar a public key do certificado
+
+            with open(name, "r") as f:
+                cert_buf = f.read()
+
+            cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert_buf)
+            date_format, encoding = "%Y%m%d%H%M%SZ", "ascii"
+            not_before = datetime.strptime(cert.get_notBefore().decode(encoding), date_format)
+            not_after = datetime.strptime(cert.get_notAfter().decode(encoding), date_format)
+            now = datetime.now()
+
+            https_error = "Error using HTTPS: "
+            if now < not_before:
+                msg = https_error + f"The certificate provided is not valid until {not_before}."
+                print(msg)
+                return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
+            if now > not_after:
+                msg = https_error + f"The certificate provided expired on {not_after}."
+                print(msg)
+                return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
+
+            ### GET DA CHAVE PÚBLICA
+            get_pub_string="openssl x509 -pubkey -noout -in "+name
+            pub_key = subprocess.check_output(get_pub_string, shell=True)
+            with open("./keys/server.crt", "r") as file:
+                server_cert = file.read()
+
+            # Getting the current date and time
+            dt = datetime.now()
+
+            # getting the timestamp
+            ts = datetime.timestamp(dt)
+            nonce = secrets.token_hex(8)  
+
+            #Mas na primeira mensagem de hello, os parametros públicos são logo enviados pelo servidor
+            p=secrets.choice(prime_numbers)
+            q=secrets.choice(prime_numbers)
+            private_key=secrets.choice(prime_numbers)
+            external_lab_data=[pub_key,p,q,private_key]
+            dic_external_labs[name]=external_lab_data
+            return Response({"certicate": server_cert, "name":"server.crt","TS": ts,"nonce":nonce,"p":p,"q":q}, status=status.HTTP_200_OK)
+        else:
+            print("CERTIFICADO FALSO")
+
+        verify = "rm "+name
+        subprocess.check_output(verify, shell=True)
+    return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def DH(request):
+    ## AQUI VAMOS FAZER A PARTE DO DH 
+    if 'certificate' in request.data and 'name' in request.data and 'partial' in request.data :
+        certificate=(request.data.get("certificate"))
+        name =(request.data.get("name"))
+        with open(name,'w') as f:
+    	    f.write(certificate)
+        #now check certificate 
+        verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+        output = subprocess.check_output(verify, shell=True)
+        outputStr = str(output.decode())
 
+        ## contruir e destruir 
+        expected_res=name + ": OK" 
+        if outputStr.rstrip()  == expected_res :
+            print("CERTIFICADO ACEITE")
+            #openssl x509 -pubkey -noout -in keys/server.crt #validar a public key do certificado
 
+            with open(name, "r") as f:
+                cert_buf = f.read()
 
+            cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert_buf)
+            date_format, encoding = "%Y%m%d%H%M%SZ", "ascii"
+            not_before = datetime.strptime(cert.get_notBefore().decode(encoding), date_format)
+            not_after = datetime.strptime(cert.get_notAfter().decode(encoding), date_format)
+            now = datetime.now()
 
+            https_error = "Error using HTTPS: "
+            if now < not_before:
+                msg = https_error + f"The certificate provided is not valid until {not_before}."
+                print(msg)
+                return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
+            if now > not_after:
+                msg = https_error + f"The certificate provided expired on {not_after}."
+                print(msg)
+                return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
 
+            ### GET DA CHAVE PÚBLICA
+            get_pub_string="openssl x509 -pubkey -noout -in "+name
+            pub_key = subprocess.check_output(get_pub_string, shell=True)
 
+            ### START 
+            if dic_external_labs[name][0]== pub_key:
+                #CONFERE
+                lab_dh = DH_Endpoint(dic_external_labs[name][1], dic_external_labs[name][2], dic_external_labs[name][3])
+                lab_parcial_key=lab_dh.generate_partial_key()
+                external_lab_parcial=request.data.get("partial")
+                key_exc=lab_dh.generate_full_key(external_lab_parcial)
+                external_lab_data=[pub_key,lab_dh]
+                dic_external_labs[name]=external_lab_data
+                print("CHAVE ESCOLHIDA ", key_exc)
 
+                return Response({"partial": lab_parcial_key}, status=status.HTTP_200_OK)
+            else:
+                return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
