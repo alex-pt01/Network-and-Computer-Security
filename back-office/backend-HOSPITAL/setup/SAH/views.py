@@ -22,6 +22,13 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 import json
 from rest_framework.parsers import JSONParser 
 from .DH import DH_Endpoint
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.Hash import SHA512, SHA384, SHA256, SHA, MD5
+from Crypto import Random
+from base64 import b64encode, b64decode
+import rsa
 
 User = get_user_model()
 
@@ -565,3 +572,56 @@ def fill_profile_external_lab(request):
 
 
     return JsonResponse(lab_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+global hash
+hash="SHA-512"
+
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def Login_External_View(request):
+    data=request.data
+    if "name" in data :
+        try:
+            values_stored=dic_external_labs[data["name"]]
+        except:
+            return Response( status=status.HTTP_400_BAD_REQUEST)
+        certificate=(data.get("certificate"))
+        name =(request.data.get("name"))
+        with open(name,'w') as f:
+            f.write(certificate)
+        #now check certificate 
+            
+        verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+        output = subprocess.check_output(verify, shell=True)
+        outputStr = str(output.decode())
+        ## contruir e destruir 
+        expected_res=name + ": OK" 
+        if outputStr.rstrip()  == expected_res :
+            ### GET DA CHAVE PÚBLICA
+            get_pub_string="openssl x509 -pubkey -noout -in "+name
+            pub_key = subprocess.check_output(get_pub_string, shell=True)
+            if pub_key ==values_stored[0]:
+                campus=data["data"]
+                campus_dec=values_stored[1].decrypt_message(campus)
+                campus_dec = campus_dec.replace("\'", "\"")
+                campus_dec_final=json.loads(campus_dec)
+                rsa_pub_key=RSA.importKey(pub_key)
+                signature=data["signature"].encode()
+                initial_message=str(campus_dec_final).encode()
+                try:
+                    verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
+                    username = campus_dec_final["username"]
+                    password = campus_dec_final["password"]
+
+                    user = authenticate(username=username, password=password)
+                    if user is not None:
+                        tokens = create_jwt_pair_for_user(user)
+                        response = {"message": "Login Successfull", "tokens": tokens}
+                        return Response(data=response, status=status.HTTP_200_OK)
+                    else:
+                        return Response(data={"message": "Invalid email or password"})
+                except:
+                    return Response( status=status.HTTP_400_BAD_REQUEST)
+  
+
+    return Response( status=status.HTTP_400_BAD_REQUEST)

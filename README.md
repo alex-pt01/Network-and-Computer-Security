@@ -31,6 +31,8 @@ pip3 install serializers
 pip3 install djangorestframework-simplejwt
 pip3 install ratelimit
 pip3 install pyOpenSSL
+pip install rsa
+
 
 ```
 

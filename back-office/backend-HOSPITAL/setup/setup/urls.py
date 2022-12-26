@@ -54,7 +54,9 @@ urlpatterns = [
     path('protocol/hello/', views.hello),    
     path('protocol/dh/', views.DH),    
     path("protocol/signup/", views.SignUpView_External_Lab.as_view()),
-    path('protocol/profileExternal/', views.fill_profile_external_lab),   
+    path('protocol/profileExternal/', views.fill_profile_external_lab),  
+    path('protocol/login/', views.Login_External_View),   
+
 
 
 ]
