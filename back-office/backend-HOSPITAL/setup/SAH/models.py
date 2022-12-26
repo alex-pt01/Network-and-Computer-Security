@@ -19,9 +19,8 @@ class DoctorProfilee(models.Model):
 class ExternalLabProfilee(models.Model):
     username = models.CharField(max_length=100)
     lab_name = models.CharField(max_length=100)
-    phone_number = models.IntegerField( blank=True, null=True)
+    phone_number = models.CharField( max_length=9,blank=True, null=True)
     address = models.CharField(max_length=300)
-
     def __str__(self):
         return self.username
 

@@ -26,7 +26,7 @@ from .DH import DH_Endpoint
 User = get_user_model()
 
 #prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 17624813, 37139213, 50728129, 77557187, 131807699, 174440041, 259336153, 326851121, 368345293, 440817757, 563167303, 718064159, 751783477, 997525853, 1107276647, 1170710369, 1367161723,52711, 648391, 9737333, 37139213, 174440041, 326851121, 718064159, 997525853, 1559861749, 2724711961, 3657500101, 5545806481, 7069067389, 8012791231, 9672485827, 12501968177, 16123689073, 16917026909, 22742734291,709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 14161729, 17624813, 19734581, 23391799, 29499439, 37139213, 38790341, 50728129, 56011909, 59053067, 68425619, 77557187, 87019979, 101146501, 113256643, 119535373, 127065427,	648391, 9737333, 174440041, 718064159, 3657500101, 7069067389, 16123689073, 22742734291, 36294260117, 64988430769, 88362852307, 136395369829, 175650481151, 200147986693, 243504973489, 318083817907, 414507281407]
-prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 52711, 648391, 9737333, 709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 648391, 9737333, 15299, 87803, 219613, 318211, 506683, 919913, 1254739, 1471343, 1828669, 2364361, 3338989, 3509299, 4030889, 5054303, 5823667, 6478961, 6816631, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
+prime_numbers=[5381, 52711, 648391, 52711, 648391, 709, 5381, 52711, 167449, 648391, 648391, 15299, 87803, 219613, 318211, 506683, 919913, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
 
 
 def create_jwt_pair_for_user(user: User):
@@ -97,24 +97,6 @@ def fill_profile(request):
             return JsonResponse(user_profile_serializer.data, status=status.HTTP_201_CREATED) 
         return JsonResponse(user_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view([ 'POST'])
-@permission_classes((AllowAny,))
-@authentication_classes([TokenAuthentication])
-def fill_profile_external_lab(request):
-    new_profile = {}
-    if request.method == 'POST':
-        user_profile_data = JSONParser().parse(request)
-        print("EXTERNAL LAB PROFILE  ", user_profile_data)
-        user = User.objects.all().last()
-        new_profile['username']=user.username
-        new_profile.update(user_profile_data)
-        print("NEW USER PROFILE  ", new_profile)
-        print()
-        lab_profile_serializer = ExternalLabProfileSerializer(data=new_profile)
-        if lab_profile_serializer.is_valid():
-            lab_profile_serializer.save()
-            return JsonResponse(lab_profile_serializer.data, status=status.HTTP_201_CREATED) 
-        return JsonResponse(lab_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view([ 'GET'])
@@ -499,11 +481,87 @@ def DH(request):
     return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class SignUpView_External_Lab(generics.GenericAPIView):
+    serializer_class = SignUpSerializer
+    permission_classes = []
+
+    def post(self, request: Request):
+        data = request.data
+        if "name" in data :
+            try:
+                values_stored=dic_external_labs[data["name"]]
+            except:
+                return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            certificate=(data.get("certificate"))
+            name =(request.data.get("name"))
+            with open(name,'w') as f:
+                f.write(certificate)
+            #now check certificate 
+                
+            verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+            output = subprocess.check_output(verify, shell=True)
+            outputStr = str(output.decode())
+
+            ## contruir e destruir 
+            expected_res=name + ": OK" 
+            if outputStr.rstrip()  == expected_res :
+                ### GET DA CHAVE PÚBLICA
+                get_pub_string="openssl x509 -pubkey -noout -in "+name
+                pub_key = subprocess.check_output(get_pub_string, shell=True)
+                if pub_key ==values_stored[0]:
+                    campus=data["data"]
+                    campus_dec=values_stored[1].decrypt_message(campus)
+                    campus_dec = campus_dec.replace("\'", "\"")
+                    campus_dec_final=json.loads(campus_dec)
+                    serializer = self.serializer_class(data=campus_dec_final)
+                    if serializer.is_valid():
+                        serializer.save()
+                        response = {"message": "User Created Successfully", "data": serializer.data}
+                        return Response(data=response, status=status.HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def fill_profile_external_lab(request):
+    new_profile = {}
+    data=request.data
+    if "name" in request.data :
+        try:
+            values_stored=dic_external_labs[data["name"]]
+        except:
+            return Response( status=status.HTTP_400_BAD_REQUEST)
+        certificate=(data.get("certificate"))
+        name =(request.data.get("name"))
+        with open(name,'w') as f:
+            f.write(certificate)
+        #now check certificate 
+            
+        verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+        output = subprocess.check_output(verify, shell=True)
+        outputStr = str(output.decode())
+
+        ## contruir e destruir 
+        expected_res=name + ": OK" 
+        if outputStr.rstrip()  == expected_res :
+            ### GET DA CHAVE PÚBLICA
+            get_pub_string="openssl x509 -pubkey -noout -in "+name
+            pub_key = subprocess.check_output(get_pub_string, shell=True)
+            if pub_key ==values_stored[0]:
+                campus=data["data"]
+                campus_dec=values_stored[1].decrypt_message(campus)
+                campus_dec = campus_dec.replace("\'", "\"")
+                campus_dec_final=json.loads(campus_dec)
+                user_profile_data =(campus_dec_final)
+                user = User.objects.all().last()
+                new_profile['username']=user.username
+                new_profile.update(user_profile_data)
+                print("NEW USER PROFILE  ", new_profile)
+                lab_profile_serializer = ExternalLabProfileSerializer(data=new_profile)
+                if lab_profile_serializer.is_valid():
+                    lab_profile_serializer.save()
+                    return JsonResponse(lab_profile_serializer.data, status=status.HTTP_201_CREATED) 
+               
 
 
-
-
-
-
+    return JsonResponse(lab_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
