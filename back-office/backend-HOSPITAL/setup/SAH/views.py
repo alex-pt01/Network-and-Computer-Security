@@ -97,6 +97,26 @@ def fill_profile(request):
             return JsonResponse(user_profile_serializer.data, status=status.HTTP_201_CREATED) 
         return JsonResponse(user_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view([ 'POST'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def fill_profile_external_lab(request):
+    new_profile = {}
+    if request.method == 'POST':
+        user_profile_data = JSONParser().parse(request)
+        print("EXTERNAL LAB PROFILE  ", user_profile_data)
+        user = User.objects.all().last()
+        new_profile['username']=user.username
+        new_profile.update(user_profile_data)
+        print("NEW USER PROFILE  ", new_profile)
+        print()
+        lab_profile_serializer = ExternalLabProfileSerializer(data=new_profile)
+        if lab_profile_serializer.is_valid():
+            lab_profile_serializer.save()
+            return JsonResponse(lab_profile_serializer.data, status=status.HTTP_201_CREATED) 
+        return JsonResponse(lab_profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view([ 'GET'])
 @permission_classes((AllowAny,))
 @authentication_classes([TokenAuthentication])
@@ -357,7 +377,7 @@ def hello(request):
         certificate=(request.data.get("certificate"))
         name =(request.data.get("name"))
         with open(name,'w') as f:
-    	    f.write(certificate)
+            f.write(certificate)
         #now check certificate 
         verify="openssl verify -verbose -CAfile keys/CA.crt "+name
         output = subprocess.check_output(verify, shell=True)
@@ -425,8 +445,9 @@ def DH(request):
         certificate=(request.data.get("certificate"))
         name =(request.data.get("name"))
         with open(name,'w') as f:
-    	    f.write(certificate)
+            f.write(certificate)
         #now check certificate 
+            
         verify="openssl verify -verbose -CAfile keys/CA.crt "+name
         output = subprocess.check_output(verify, shell=True)
         outputStr = str(output.decode())

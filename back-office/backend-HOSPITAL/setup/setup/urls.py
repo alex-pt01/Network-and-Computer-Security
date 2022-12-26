@@ -53,7 +53,7 @@ urlpatterns = [
     #Protocol
     path('protocol/hello/', views.hello),    
     path('protocol/dh/', views.DH),    
-
+    path('protocol/profile-extern-lab', views.fill_profile_external_lab),   
 
 
 ]

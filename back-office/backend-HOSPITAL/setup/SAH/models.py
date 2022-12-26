@@ -16,6 +16,15 @@ class DoctorProfilee(models.Model):
     def __str__(self):
         return self.username
 
+class ExternalLabProfilee(models.Model):
+    username = models.CharField(max_length=100)
+    lab_name = models.CharField(max_length=100)
+    phone_number = models.IntegerField( blank=True, null=True)
+    address = models.CharField(max_length=300)
+
+    def __str__(self):
+        return self.username
+
 
 class Consult(models.Model):
     scheduled_date = models.DateTimeField(default=datetime.now, null=True)

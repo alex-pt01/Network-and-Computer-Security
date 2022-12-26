@@ -21,6 +21,11 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
         model = DoctorProfilee
         fields = ('id', 'username', 'specialization', 'first_name', 'last_name', 'id_card')
     
+class ExternalLabProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExternalLabProfilee
+        fields = ('id', 'username', 'lab_name', 'phone_number', 'address')
+
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.CharField(max_length=80)
     username = serializers.CharField(max_length=45)

@@ -15,7 +15,10 @@ class newUserForm(UserCreationForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'job', 'specialization', 'email', 'id_card', 'password1', 'password2']
         #fields = UserCreationForm.Meta.fields + ('specialization',)
+
+
 """
+
 class updateUserForm(forms.Form):
     first_name = forms.CharField(label='First Name', required=True)
     last_name = forms.CharField(label='Last Name', required=True)
