@@ -16,6 +16,9 @@ from DH import DH_Endpoint
 prime_numbers=[5381, 52711, 648391, 52711, 648391, 709, 5381, 52711, 167449, 648391, 648391, 15299, 87803, 219613, 318211, 506683, 919913, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
 
 
+global hash
+hash="SHA-512"
+
 HEADERS = {
     "accept": "application/json",
     "Content-Type": "application/json",
@@ -150,8 +153,64 @@ campos_cipher=lab_dh.encrypt_message(campos)
 params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
 resp = requests.post(URL_HOSPITAL+'protocol/login/', headers = HEADERS ,data=json.dumps(params))
 resp=json.loads(resp.text)
-HEADERS["Authorization"]="Bearer "+resp["tokens"]["access"]
+signature=resp["signature"].encode()
+rsa_pub_key=RSA.importKey(pub_key)
+campus=resp["response"]
+campus_dec=lab_dh.decrypt_message(campus)
+campus_dec = campus_dec.replace("\'", "\"")
+campus_dec_final=json.loads(campus_dec)
+initial_message=str(campus_dec_final).encode()
+try:
+    verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
+except:
+    print("fake server")
+    exit()
+###CHECK SERVER SIGNATURE
+if campus_dec_final["message"] == "Login Successfull":
+    HEADERS["Authorization"]="Bearer "+campus_dec_final["tokens"]["access"]
+else:
+    print("SOMETHING WRONG HAPPEN")
+    exit()
 
+while True:
+    print("AUTHENTICATION SUCCESS NOW YOU CAN INTERACT")
+    print("Options : ")
+    print("1: Get an Exam")
+    print("2: Post an Exam")
+    option = input("Which action you want to take? (1/2)")
+
+    if option=="1":
+        dt = datetime.now()
+        ts = datetime.timestamp(dt)
+        params=str({"msg":"get_my_exams"})
+        campos_encode=params.encode()
+        signature = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
+        campos_cipher=lab_dh.encrypt_message(params)
+        params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
+        resp = requests.get(URL_HOSPITAL+'protocol/get-my-exams/', headers = HEADERS ,data=json.dumps(params))
+        resp=json.loads(resp.text)
+
+        signature=resp["signature"].encode()
+        rsa_pub_key=RSA.importKey(pub_key)
+        campus=resp["response"]
+        campus_dec=lab_dh.decrypt_message(campus)
+        campus_dec = campus_dec.replace("\'", "\"")
+        campus_dec_final=json.loads(campus_dec)
+        initial_message=str(campus_dec_final).encode()
+        try:
+            verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
+        except:
+            print("fake server")
+            exit()
+        print(campus_dec_final)
+    elif option=="2":
+        continue
+    else:
+        print("WRONG OPTION")
+    break
+
+params={"certificate" : cert_buf, "name": "server.crt"}
+resp = requests.post(URL_HOSPITAL+'protocol/logout/', headers = HEADERS ,data=json.dumps(params))
 
 #####Testes 
 
