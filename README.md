@@ -5,23 +5,27 @@
 </p>
 
 Saint Acutis hospital has operated in Portugal since 2020. It provides Urgent Care, open 24/7 (24 hours, 7 days a week). It also provides Specialty Consultations, including: Orthopedic, Cardiology, and Dermatology.
+
 The front-office of the hospital offers both a public web site, for displaying general information, and a customer web site, where patients can check their appointments and make new ones. There is also a mobile application that provides the same functionality.
+
 The back-office is used to manage the schedule, the room reservations, and the medical records. The system has integrations with external institutions, namely, the Ministry for Health, and several exam facilities and laboratories.
 
+Briefly in this document you can find general information about the problems that our project solves as well as the technologies used in its creation, then everything you need to know to test our project, memsom deployment demo and additional information about the authors, contributions and acknowledgments.
 
 ## General Information
 
 This section expands on the introductory paragraph to give readers a better understanding of your project. 
 Include a brief description and answer the question, "what problem does this project solve?"
 
+Our hospital provides urgent care, open 24/7 (24 hours, 7 days a week) as well as speciality consultations, including: orthopedy, cardiology, and dermatology. ##MAIS????
+
 ### Built With
 
-Include an outline of the technologies in the project, such as framework (Rails/iOS/Android), as well as programming language, database,  links to any related projects (for example, whether this API has corresponding iOS or Android clients), links to online tools related to the application (such as the project web site, the shared file storage).
-If you mention something, please provide links.
+In order to create the applications we used the django framework with the SQLite database since it allows rapid development of secure and maintainable websites. In order to develop the CA (Certificate Authority) we used OpenSSL that is free, open-source library used for digital certificates and the libraries used for cryptography were: ##TODO 
 
-* [Java](https://openjdk.java.net/) - Programming Language and Platform
-* [Maven](https://maven.apache.org/) - Build Tool and Dependency Management
-* ...
+* [Django](https://www.djangoproject.com/) - Python web framework
+* [SQLite](https://www.sqlite.org/index.html) - SQL database engine
+* [OpenSSL](https://www.openssl.org/) -  Programming library used to implement encryption and authentication
 
 ## Getting Started
 
