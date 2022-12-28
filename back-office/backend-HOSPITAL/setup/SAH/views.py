@@ -524,7 +524,7 @@ class SignUpView_External_Lab(generics.GenericAPIView):
                     if serializer.is_valid():
                         serializer.save()
                         response = {"message": "User Created Successfully", "data": serializer.data}
-                        return Response(data=response, status=status.HTTP_201_CREATED)
+                        return Response(status=status.HTTP_201_CREATED)
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -567,7 +567,7 @@ def fill_profile_external_lab(request):
                 lab_profile_serializer = ExternalLabProfileSerializer(data=new_profile)
                 if lab_profile_serializer.is_valid():
                     lab_profile_serializer.save()
-                    return JsonResponse(lab_profile_serializer.data, status=status.HTTP_201_CREATED) 
+                    return JsonResponse(status=status.HTTP_201_CREATED) 
                
 
 
@@ -612,16 +612,262 @@ def Login_External_View(request):
                     verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
                     username = campus_dec_final["username"]
                     password = campus_dec_final["password"]
-
+                    dic_external_labs[data["name"]]=[values_stored[0],values_stored[1],username]
                     user = authenticate(username=username, password=password)
                     if user is not None:
                         tokens = create_jwt_pair_for_user(user)
-                        response = {"message": "Login Successfull", "tokens": tokens}
+
+                        with open("./keys/server.key", "r") as key_file:
+                            privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
+
+                        response = str({"message": "Login Successfull", "tokens": tokens})
+                        response_encrypted=values_stored[1].encrypt_message(response)
+                       
+                        campos_encode=response.encode()
+                        dt=datetime.now()
+                        ts = datetime.timestamp(dt)
+                        signature_server = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
+                        response={}
+                        response["ts"]=ts
+                        response["signature"]=signature_server
+                        response["response"]=response_encrypted
                         return Response(data=response, status=status.HTTP_200_OK)
                     else:
-                        return Response(data={"message": "Invalid email or password"})
+                        response = str({"message": "Invalid email or password"})
+                        response_encrypted=values_stored[1].encrypt_message(response)
+                        response={}
+                        response["response"]=response_encrypted
+                        return Response(data=response, status=status.HTTP_200_OK)
                 except:
                     return Response( status=status.HTTP_400_BAD_REQUEST)
   
 
     return Response( status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def logout_protocol_view(request):
+    logoutUser(request)
+    if 'certificate' in request.data and 'name' in request.data :
+        certificate=(request.data.get("certificate"))
+        name =(request.data.get("name"))
+        try:
+            values_stored=dic_external_labs[data["name"]]
+        except:
+            return Response(status=status.HTTP_200_OK)
+
+        get_pub_string="openssl x509 -pubkey -noout -in "+name
+        pub_key = subprocess.check_output(get_pub_string, shell=True)
+        if pub_key == values_stored[0]:
+            del dic_external_labs["name"]
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def new_exam(request):
+    data=request.data
+    if "name" in data :
+        try:
+            values_stored=dic_external_labs[data["name"]]
+        except:
+            return Response( status=status.HTTP_400_BAD_REQUEST)
+        certificate=(data.get("certificate"))
+        name =(request.data.get("name"))
+        with open(name,'w') as f:
+            f.write(certificate)
+        #now check certificate 
+            
+        verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+        output = subprocess.check_output(verify, shell=True)
+        outputStr = str(output.decode())
+        ## contruir e destruir 
+        expected_res=name + ": OK" 
+        if outputStr.rstrip()  == expected_res :
+            ### GET DA CHAVE PÚBLICA
+            get_pub_string="openssl x509 -pubkey -noout -in "+name
+            pub_key = subprocess.check_output(get_pub_string, shell=True)
+            if pub_key ==values_stored[0]:
+                campus=data["data"]
+                campus_dec=values_stored[1].decrypt_message(campus)
+                campus_dec = campus_dec.replace("\'", "\"")
+                campus_dec_final=json.loads(campus_dec)
+                rsa_pub_key=RSA.importKey(pub_key)
+                signature=data["signature"].encode()
+                initial_message=str(campus_dec_final).encode()
+                try:
+                    verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
+                except:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                    
+                if campus_dec_final["lab_name"] == values_stored[2]:
+                    ### AGORA AQUI VAMOS LER TODOS OS EXAMES DESTE HOSPITAL
+                    signature= signature.decode()
+                    print(signature)
+                    campus_dec_final["hash"]=signature
+                    user_profile_serializer = ExternalLabsSerializer(data=campus_dec_final)
+                    if user_profile_serializer.is_valid():
+                        user_profile_serializer.save()
+                        with open("./keys/server.key", "r") as key_file:
+                            privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
+
+                        response = str({"status":"ACCEPTED"})
+                        response_encrypted=values_stored[1].encrypt_message(response)
+                        campos_encode=response.encode()
+                        print(campos_encode)
+                        dt=datetime.now()
+                        ts = datetime.timestamp(dt)
+                        signature_server = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
+                        response={}
+                        response["ts"]=ts
+                        response["signature"]=signature_server
+                        response["response"]=response_encrypted
+                        return Response(data=response, status=status.HTTP_200_OK)
+                    with open("./keys/server.key", "r") as key_file:
+                        privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
+                    response = str({"status":"NotACCEPTED"})
+                    response_encrypted=values_stored[1].encrypt_message(response)
+                    campos_encode=response.encode()
+                    print(campos_encode)
+                    dt=datetime.now()
+                    ts = datetime.timestamp(dt)
+                    signature_server = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
+                    response={}
+                    response["ts"]=ts
+                    response["signature"]=signature_server
+                    response["response"]=response_encrypted
+                return Response(data=response, status=status.HTTP_200_OK)
+
+    return JsonResponse(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def get_my_exams(request):
+    data=request.data
+    if "name" in data :
+        try:
+            values_stored=dic_external_labs[data["name"]]
+        except:
+            return Response( status=status.HTTP_400_BAD_REQUEST)
+        certificate=(data.get("certificate"))
+        name =(request.data.get("name"))
+        with open(name,'w') as f:
+            f.write(certificate)
+        #now check certificate 
+            
+        verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+        output = subprocess.check_output(verify, shell=True)
+        outputStr = str(output.decode())
+        ## contruir e destruir 
+        expected_res=name + ": OK" 
+        if outputStr.rstrip()  == expected_res :
+            ### GET DA CHAVE PÚBLICA
+            get_pub_string="openssl x509 -pubkey -noout -in "+name
+            pub_key = subprocess.check_output(get_pub_string, shell=True)
+            if pub_key ==values_stored[0]:
+                campus=data["data"]
+                campus_dec=values_stored[1].decrypt_message(campus)
+                campus_dec = campus_dec.replace("\'", "\"")
+                campus_dec_final=json.loads(campus_dec)
+                rsa_pub_key=RSA.importKey(pub_key)
+                signature=data["signature"].encode()
+                initial_message=str(campus_dec_final).encode()
+                try:
+                    verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
+                except:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+                
+                ### AGORA AQUI VAMOS LER TODOS OS EXAMES DESTE HOSPITAL
+                username=values_stored[2]
+                exams=ExternalLabs.objects.filter(lab_name=username)
+
+                ret_values={}
+                for exam in exams:
+                    ret_values[str(exam.id)]=exam.intro
+                
+                ### ver como cifrar uma lista e depois enviar 
+                print(ret_values)
+                with open("./keys/server.key", "r") as key_file:
+                    privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
+
+                response = str(ret_values)
+                response_encrypted=values_stored[1].encrypt_message(response)
+                campos_encode=response.encode()
+                print(campos_encode)
+                dt=datetime.now()
+                ts = datetime.timestamp(dt)
+                signature_server = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
+                response={}
+                response["ts"]=ts
+                response["signature"]=signature_server
+                response["response"]=response_encrypted
+                return Response(data=response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@authentication_classes([TokenAuthentication])
+def get_exam(request):
+    data=request.data
+    if "name" in data :
+        try:
+            values_stored=dic_external_labs[data["name"]]
+        except:
+            return Response( status=status.HTTP_400_BAD_REQUEST)
+        certificate=(data.get("certificate"))
+        name =(request.data.get("name"))
+        with open(name,'w') as f:
+            f.write(certificate)
+        #now check certificate 
+            
+        verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+        output = subprocess.check_output(verify, shell=True)
+        outputStr = str(output.decode())
+        ## contruir e destruir 
+        expected_res=name + ": OK" 
+        if outputStr.rstrip()  == expected_res :
+            ### GET DA CHAVE PÚBLICA
+            get_pub_string="openssl x509 -pubkey -noout -in "+name
+            pub_key = subprocess.check_output(get_pub_string, shell=True)
+            if pub_key ==values_stored[0]:
+                campus=data["data"]
+                campus_dec=values_stored[1].decrypt_message(campus)
+                campus_dec = campus_dec.replace("\'", "\"")
+                campus_dec_final=json.loads(campus_dec)
+                rsa_pub_key=RSA.importKey(pub_key)
+                signature=data["signature"].encode()
+                initial_message=str(campus_dec_final).encode()
+                try:
+                    verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
+                except:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+                
+                ### AGORA AQUI VAMOS LER TODOS OS EXAMES DESTE HOSPITAL
+                username=values_stored[2]
+                exams=ExternalLabs.objects.get(lab_name=username,id=int(campus_dec_final["id"]))
+                ret_values = ExternalLabsSerializer(exams)
+                ret_values=ret_values.data                
+                ### ver como cifrar uma lista e depois enviar 
+                print(ret_values)
+                with open("./keys/server.key", "r") as key_file:
+                    privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
+
+                response = str(ret_values)
+                response_encrypted=values_stored[1].encrypt_message(response)
+                campos_encode=response.encode()
+                print(campos_encode)
+                dt=datetime.now()
+                ts = datetime.timestamp(dt)
+                signature_server = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
+                response={}
+                response["ts"]=ts
+                response["signature"]=signature_server
+                response["response"]=response_encrypted
+                return Response(data=response, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -55,7 +55,15 @@ urlpatterns = [
     path('protocol/dh/', views.DH),    
     path("protocol/signup/", views.SignUpView_External_Lab.as_view()),
     path('protocol/profileExternal/', views.fill_profile_external_lab),  
-    path('protocol/login/', views.Login_External_View),   
+    path('protocol/login/', views.Login_External_View),  
+    path('protocol/logout/', views.logout_protocol_view),  
+    path('protocol/get-my-exams/', views.get_my_exams),  
+    path('protocol/new-exam/', views.new_exam), 
+    path('protocol/get-exam/', views.get_exam),  
+
+
+
+
 
 
 
