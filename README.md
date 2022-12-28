@@ -1,7 +1,10 @@
 # Healthcare: SAH
 
-![Screenshot](logo.png)
-
+<img
+  src="logo.png"
+  alt="Alt text"
+  title="Optional title"
+  style="display: inline-block; margin: 0 auto; max-width: 60px">
 
 Saint Acutis hospital has operated in Portugal since 2020. It provides Urgent Care, open 24/7 (24 hours, 7 days a week). It also provides Specialty Consultations, including: Orthopedic, Cardiology, and Dermatology.
 The front-office of the hospital offers both a public web site, for displaying general information, and a customer web site, where patients can check their appointments and make new ones. There is also a mobile application that provides the same functionality.
