@@ -1,9 +1,10 @@
-# Project Title
+# Healthcare: SAH
 
-Place logos here, if they exist
 
-Begin with an introductory paragraph that tells readers the purpose of your software and its major benefits. 
-Give them a summary of the information you will include in your ReadMe using clearly defined sections.
+Saint Acutis hospital has operated in Portugal since 2020. It provides Urgent Care, open 24/7 (24 hours, 7 days a week). It also provides Specialty Consultations, including: Orthopedic, Cardiology, and Dermatology.
+The front-office of the hospital offers both a public web site, for displaying general information, and a customer web site, where patients can check their appointments and make new ones. There is also a mobile application that provides the same functionality.
+The back-office is used to manage the schedule, the room reservations, and the medical records. The system has integrations with external institutions, namely, the Ministry for Health, and several exam facilities and laboratories.
+
 
 ## General Information
 
