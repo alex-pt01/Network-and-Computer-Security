@@ -56,7 +56,7 @@ class ExternalLabs(models.Model):
     materials = models.CharField(max_length=400)
     procedure = models.CharField(max_length=400)
     results = models.CharField(max_length=400)
-    hash = models.CharField(max_length=1000)
+    hash = models.CharField(max_length=10000)
 
     def __str__(self):
         return self.lab_name

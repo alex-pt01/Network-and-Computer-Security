@@ -59,7 +59,7 @@ urlpatterns = [
     path('protocol/logout/', views.logout_protocol_view),  
     path('protocol/get-my-exams/', views.get_my_exams),  
     path('protocol/new-exam/', views.new_exam), 
-    path('protocol/get-exam/<str:id>', views.get_exam),  
+    path('protocol/get-exam/', views.get_exam),  
 
 
 
