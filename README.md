@@ -159,6 +159,7 @@ Gateway:192.168.1.254
 ```
 
 #TODO -> alterar os files e os links
+
 Then you need to configure the **firewalls** using the following configuration files:
 
 * [Firewall configuration file for VM2](Firewalls%20config/firewall_VM2.txt)
