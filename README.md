@@ -97,11 +97,55 @@ pip3 install pyOpenSSL
 
 Install RSA library. It supports encryption and decryption, signing and verifying signatures, and key generation 
 ```
-pip install rsa
+pip3 install rsa
 ```
 
+To setup our project environment to be used with [VirtualBox](https://www.virtualbox.org/), you need to have 6 instances of VMs.
 
+#TODO -> VERIFICAR!
+**VM1: Ministry of Health**
+```
+Network adapter 1 : Internal network , name : sw-1 (Promiscuous MODE : Allow VMS)
+IP: 192.168.0.100 
+Gateway:192.168.0.10
+```
 
+**VM2: ROUTER/FIREWALL**
+```
+Network adapter 1: Internal Network , name : sw-1 (GENERATE NEW MAC ADDRESSES) (Promiscuous MODE : Allow VMS)
+IP:192.168.0.10
+Network adapter 2: Internal Network , name sw-2 (Promiscuous MODE : Allow VMS)
+IP:192.168.1.254
+Adapter 3: associated with NAT.
+```
+
+**VM3: Front Office APP**
+```
+Network adapter 1: Internal network, name sw-2 (Promiscuous MODE: Allow VMS)
+IP:192.168.1.3
+Gateway:192.168.1.254
+```
+
+**VM4: Back Office APP**
+```
+Network adapter 1: Internal network, name sw-2 (Promiscuous MODE : Allow VMS)
+IP:192.168.1.4
+Gateway:192.168.1.254
+```
+
+**VM5: Front Office DB**
+```
+Network adapter 1: Internal Network, name sw-2 (PROMISE MODE: Allow VMS)
+IP:192.168.1.5
+Gateway:192.168.1.254
+```
+
+**VM6: Back Office DB **
+```
+Network adapter 1: Internal Network, name sw-2 (Promiscuous MODE : Allow VMS)
+IP:192.168.1.6
+Gateway:192.168.1.254
+```
 
 
 ### Installing
