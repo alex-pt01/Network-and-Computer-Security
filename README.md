@@ -114,7 +114,7 @@ Gateway:192.168.0.10
 Then you need to copy the contents of the file [vm1.yml](VMs%20config/vm1.yml)
  and paste into /etc/netplan/01-network-manager-all.yaml on VM1.
  
-**VM2: ROUTER/FIREWALL**
+**VM2: Router/Firewall**
 ```
 Network adapter 1: Internal Network , name : sw-1 (GENERATE NEW MAC ADDRESSES) (Promiscuous MODE : Allow VMS)
 IP:192.168.0.10
@@ -158,6 +158,7 @@ IP:192.168.1.6
 Gateway:192.168.1.254
 ```
 
+Then you need to configure the **firewalls** using iptables with the firewall_VM2 and firewall_VM3 commands for VM2 and VM3 respectively
 
 ### Installing
 
