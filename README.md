@@ -103,6 +103,7 @@ pip3 install rsa
 To setup our project environment to be used with [VirtualBox](https://www.virtualbox.org/), you need to have 6 instances of VMs.
 
 #TODO -> VERIFICAR!
+
 **VM1: Ministry of Health**
 ```
 Network adapter 1 : Internal network , name : sw-1 (Promiscuous MODE : Allow VMS)
@@ -140,7 +141,7 @@ IP:192.168.1.5
 Gateway:192.168.1.254
 ```
 
-**VM6: Back Office DB **
+**VM6: Back Office DB**
 ```
 Network adapter 1: Internal Network, name sw-2 (Promiscuous MODE : Allow VMS)
 IP:192.168.1.6
