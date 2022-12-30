@@ -1,0 +1,5 @@
+sudo /sbin/iptables -t nat -A INPUT -p tcp --dport 8000 -j ACCEPT
+	sudo /sbin/iptables -P INPUT DROP
+
+sudo sh -c 'iptables-save > /etc/iptables/rules.v4'
+sudo sh -c 'ip6tables-save > /etc/iptables/rules.v6'
