@@ -158,7 +158,13 @@ IP:192.168.1.6
 Gateway:192.168.1.254
 ```
 
-Then you need to configure the **firewalls** using iptables with the firewall_VM2 and firewall_VM3 commands for VM2 and VM3 respectively
+#TODO -> alterar os files e os links
+Then you need to configure the **firewalls** using the following configuration files:
+
+* [Firewall configuration file for VM2](Firewalls%20config/firewall_VM2.txt)
+* [Firewall configuration file for VM3](Firewalls%20config/firewall_VM3.txt)
+* [Firewall configuration file for VM4](Firewalls%20config/firewall_VM4.txt)
+
 
 ### Installing
 
