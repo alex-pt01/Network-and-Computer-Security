@@ -111,6 +111,9 @@ IP: 192.168.0.100
 Gateway:192.168.0.10
 ```
 
+Then you need to copy the contents of the file [vm1.yml](VMs%20config/vm1.yml)
+ present in the directory to /etc/netplan/01-network-manager-all.yaml na VM1
+ 
 **VM2: ROUTER/FIREWALL**
 ```
 Network adapter 1: Internal Network , name : sw-1 (GENERATE NEW MAC ADDRESSES) (Promiscuous MODE : Allow VMS)
