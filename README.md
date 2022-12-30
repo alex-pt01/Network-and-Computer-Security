@@ -33,13 +33,46 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What kind of **hardware** device and which **operating system** do you need to have to install the software.
+In order to use our system you need to use an electronic device such as a computer that has the [Linux](https://www.linux.com/what-is-linux/) operating system.
 
-In this section also include detailed instructions for installing additiona software the application is dependent upon (such as PostgreSQL database, for example). 
+Open the Terminal program. This is usually found under Utilities or Accessories.
 
+To use the django framework you need to use the following requirements:
+
+Install the virtualenv package
 ```
-Give installation command examples
+pip3 install virtualenv
 ```
+
+Create the virtual environment
+```
+virtualenv django
+```
+
+Activate the virtual environment
+```
+source django/bin/activate
+```
+
+Install the Django code
+```
+python3 -m pip install django
+```
+Install the Django code
+
+
+python3 -m pip install django-allauth
+pip3 install django-sslserver
+pip3 install django-debug-toolbar
+pip3 install django-createsuperuser
+pip3 install djangorestframework
+pip3 install django-cors-headers
+pip3 install serializers
+pip3 install djangorestframework-simplejwt
+pip3 install ratelimit
+pip3 install pyOpenSSL
+pip install rsa
+
 
 ### Installing
 
