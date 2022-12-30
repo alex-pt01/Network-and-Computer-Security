@@ -112,7 +112,7 @@ Gateway:192.168.0.10
 ```
 
 Then you need to copy the contents of the file [vm1.yml](VMs%20config/vm1.yml)
- present in the directory to /etc/netplan/01-network-manager-all.yaml on VM1.
+ and paste into /etc/netplan/01-network-manager-all.yaml on VM1.
  
 **VM2: ROUTER/FIREWALL**
 ```
@@ -123,7 +123,7 @@ IP:192.168.1.254
 Adapter 3: associated with NAT.
 ```
 Then you need to copy the contents of the file [vm2.yml](VMs%20config/vm2.yml)
- present in the directory to /etc/netplan/01-network-manager-all.yaml on VM2.
+ and paste into /etc/netplan/01-network-manager-all.yaml on VM2.
  
 **VM3: Front Office APP**
 ```
@@ -132,7 +132,7 @@ IP:192.168.1.3
 Gateway:192.168.1.254
 ```
 Then you need to copy the contents of the file [vm3.yml](VMs%20config/vm3.yml)
- present in the directory to /etc/netplan/01-network-manager-all.yaml on VM3.
+ and paste into /etc/netplan/01-network-manager-all.yaml on VM3.
  
 **VM4: Back Office APP**
 ```
@@ -141,7 +141,7 @@ IP:192.168.1.4
 Gateway:192.168.1.254
 ```
 Then you need to copy the contents of the file [vm4.yml](VMs%20config/vm4.yml)
- present in the directory to /etc/netplan/01-network-manager-all.yaml on VM4.
+ and paste into /etc/netplan/01-network-manager-all.yaml on VM4.
  
 
 **VM5: Front Office DB**
