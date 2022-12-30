@@ -34,9 +34,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 In order to use our system you need to use an electronic device such as a computer that has the [Linux](https://www.linux.com/what-is-linux/) operating system.
-
 Open the Terminal program. This is usually found under Utilities or Accessories.
-
 To use the django framework you need to use the following requirements:
 
 Install the virtualenv package
