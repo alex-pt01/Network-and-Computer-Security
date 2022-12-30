@@ -35,7 +35,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 In order to use our system you need to use an electronic device such as a computer that has the [Linux](https://www.linux.com/what-is-linux/) operating system.
 Open the Terminal program. This is usually found under Utilities or Accessories.
-To use the django framework you need to use the following requirements:
+To use the **django framework** you need to use the following requirements:
 
 Install the virtualenv package
 ```
@@ -56,21 +56,49 @@ Install the Django code
 ```
 python3 -m pip install django
 ```
-Install the Django code
 
-
+Install django-allauth that deals with account authentication, registration, management, and third-party (social) account authentication.
+```
 python3 -m pip install django-allauth
+```
+
+Install django-sslserver that helps to run the server with the certificate we are to create.
+```
 pip3 install django-sslserver
+```
+
+Install debug-toolbar is a configurable set of panels that display various debug information about the current request/response and when clicked, display more details about the panel's content.
+```
 pip3 install django-debug-toolbar
+```
+
+Create superuser if you need a new one or use (username: adminsirs; password: @adsirs123)the one who can log into admin page and who can have permissions to add, edit, delete objects in thru admin page
+```
 pip3 install django-createsuperuser
+```
+
+To create an API endpoints (code that allows two software programs to communicate with each other)
+```
 pip3 install djangorestframework
 pip3 install django-cors-headers
 pip3 install serializers
 pip3 install djangorestframework-simplejwt
-pip3 install ratelimit
-pip3 install pyOpenSSL
-pip install rsa
+```
 
+Install ratelimit. Rate limiting blocks users, bots, or applications that are over-using or abusing a web property. 
+```
+pip3 install ratelimit
+```
+
+Install pyOpenSSL. The following modules are defined: Elliptic curves. Serialization and deserialization. Signing and verifying signatures.
+```
+pip3 install pyOpenSSL
+```
+
+Install RSA library. It supports encryption and decryption, signing and verifying signatures, and key generation 
+```
+pip install rsa
+```
 
 ### Installing
 
