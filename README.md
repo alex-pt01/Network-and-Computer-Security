@@ -105,9 +105,16 @@ Install OS module. The OS module in python provides functions for interacting wi
 pip3 install os-sys
 ```
 
-To setup our project environment to be used with [SEED-Ubuntu20.04](https://seedsecuritylabs.org/labsetup.html) (username: seeds, password: dees), you need to have 4 instances of VMs.
-
-#TODO -> VERIFICAR!
+To setup our project environment to be used with [SEED-Ubuntu20.04](https://seedsecuritylabs.org/labsetup.html) (username: seeds, password: dees), you need to have 4 instances of VMs. For each machine, after editing the file mentioned below run:
+```
+sudo netplan try
+sudo netplan apply
+```
+and
+```
+sudo apt install iptables-persistent
+```
+to make the iptables rules persistent.
 
 **VM1: Ministry of Health**
 ```
