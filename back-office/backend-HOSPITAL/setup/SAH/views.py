@@ -30,6 +30,9 @@ from Crypto import Random
 from base64 import b64encode, b64decode
 import rsa
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 User = get_user_model()
 
 #prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 17624813, 37139213, 50728129, 77557187, 131807699, 174440041, 259336153, 326851121, 368345293, 440817757, 563167303, 718064159, 751783477, 997525853, 1107276647, 1170710369, 1367161723,52711, 648391, 9737333, 37139213, 174440041, 326851121, 718064159, 997525853, 1559861749, 2724711961, 3657500101, 5545806481, 7069067389, 8012791231, 9672485827, 12501968177, 16123689073, 16917026909, 22742734291,709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 14161729, 17624813, 19734581, 23391799, 29499439, 37139213, 38790341, 50728129, 56011909, 59053067, 68425619, 77557187, 87019979, 101146501, 113256643, 119535373, 127065427,	648391, 9737333, 174440041, 718064159, 3657500101, 7069067389, 16123689073, 22742734291, 36294260117, 64988430769, 88362852307, 136395369829, 175650481151, 200147986693, 243504973489, 318083817907, 414507281407]
@@ -430,6 +433,7 @@ def hello(request):
 @permission_classes((AllowAny,))
 def DH(request):
     ## AQUI VAMOS FAZER A PARTE DO DH 
+    print(request.data)
     if 'certificate' in request.data and 'name' in request.data and 'partial' in request.data :
         certificate=(request.data.get("certificate"))
         name =(request.data.get("name"))
@@ -463,13 +467,11 @@ def DH(request):
                 return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
             if now > not_after:
                 msg = https_error + f"The certificate provided expired on {not_after}."
-                print(msg)
                 return Response({"data": "Invalid Certificate"}, status=status.HTTP_400_BAD_REQUEST)
 
             ### GET DA CHAVE PÚBLICA
             get_pub_string="openssl x509 -pubkey -noout -in "+name
             pub_key = subprocess.check_output(get_pub_string, shell=True)
-
             ### START 
             if dic_external_labs[name][0]== pub_key:
                 #CONFERE
@@ -523,8 +525,8 @@ class SignUpView_External_Lab(generics.GenericAPIView):
                     serializer = self.serializer_class(data=campus_dec_final)
                     if serializer.is_valid():
                         serializer.save()
-                        response = {"message": "User Created Successfully", "data": serializer.data}
-                        return Response(status=status.HTTP_201_CREATED)
+                        response = {"message": "User Created Successfully", "data": "User Created Successfully"}
+                        return Response(response,status=status.HTTP_201_CREATED)
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -567,7 +569,7 @@ def fill_profile_external_lab(request):
                 lab_profile_serializer = ExternalLabProfileSerializer(data=new_profile)
                 if lab_profile_serializer.is_valid():
                     lab_profile_serializer.save()
-                    return JsonResponse(status=status.HTTP_201_CREATED) 
+                    return JsonResponse({"data": "User Created Successfully"},status=status.HTTP_201_CREATED) 
                
 
 
@@ -724,19 +726,19 @@ def new_exam(request):
                         response["signature"]=signature_server
                         response["response"]=response_encrypted
                         return Response(data=response, status=status.HTTP_200_OK)
-                    with open("./keys/server.key", "r") as key_file:
-                        privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
-                    response = str({"status":"NotACCEPTED"})
-                    response_encrypted=values_stored[1].encrypt_message(response)
-                    campos_encode=response.encode()
-                    print(campos_encode)
-                    dt=datetime.now()
-                    ts = datetime.timestamp(dt)
-                    signature_server = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
-                    response={}
-                    response["ts"]=ts
-                    response["signature"]=signature_server
-                    response["response"]=response_encrypted
+                with open("./keys/server.key", "r") as key_file:
+                    privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
+                response = str({"status":"NotACCEPTED"})
+                response_encrypted=values_stored[1].encrypt_message(response)
+                campos_encode=response.encode()
+                print(campos_encode)
+                dt=datetime.now()
+                ts = datetime.timestamp(dt)
+                signature_server = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
+                response={}
+                response["ts"]=ts
+                response["signature"]=signature_server
+                response["response"]=response_encrypted
                 return Response(data=response, status=status.HTTP_200_OK)
 
     return JsonResponse(status=status.HTTP_400_BAD_REQUEST)

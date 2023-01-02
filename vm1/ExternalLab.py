@@ -15,6 +15,8 @@ from DH import DH_Endpoint
 #prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 52711, 648391, 9737333, 709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 648391, 9737333, 15299, 87803, 219613, 318211, 506683, 919913, 1254739, 1471343, 1828669, 2364361, 3338989, 3509299, 4030889, 5054303, 5823667, 6478961, 6816631, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
 prime_numbers=[5381, 52711, 648391, 52711, 648391, 709, 5381, 52711, 167449, 648391, 648391, 15299, 87803, 219613, 318211, 506683, 919913, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 global hash
 hash="SHA-512"
@@ -25,26 +27,26 @@ HEADERS = {
 }
 
 
-URL_HOSPITAL = "http://192.168.1.4:8003/"
+URL_HOSPITAL = "https://192.168.1.4:8003/"
 
 hospital_data={}
 
 
-with open("./keys/server.crt", "r") as f:
+with open("./Labex.crt", "r") as f:
         cert_buf = f.read()
 
 
 #name é o nome do certicado com o .crt
-params={"certificate" : cert_buf, "name": "server.crt"}
+params={"certificate" : cert_buf, "name": "Labex.crt"}
 
-resp = requests.post(URL_HOSPITAL+'protocol/hello/', headers = HEADERS ,data=json.dumps(params))
+resp = requests.post(URL_HOSPITAL+'protocol/hello/', headers = HEADERS ,data=json.dumps(params),verify=False)
 resp=json.loads(resp.text)
 name=resp["name"]
 
 with open(resp["name"],'w') as f:
     f.write(resp["certicate"])
 #now check certificate 
-verify="openssl verify -verbose -CAfile keys/CA.crt "+name
+verify="openssl verify -verbose -CAfile ../CA/CA.crt "+name
 output = subprocess.check_output(verify, shell=True)
 outputStr = str(output.decode())
 
@@ -54,10 +56,10 @@ if outputStr.rstrip()  == expected_res :
     #openssl x509 -pubkey -noout -in keys/server.crt #validar a public key do certificado
 
     with open(name, "r") as f:
-        cert_buf = f.read()
+        server_buf = f.read()
 
 
-    cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert_buf)
+    cert = crypto.load_certificate(crypto.FILETYPE_PEM, server_buf)
     date_format, encoding = "%Y%m%d%H%M%SZ", "ascii"
     not_before = datetime.strptime(cert.get_notBefore().decode(encoding), date_format)
     not_after = datetime.strptime(cert.get_notAfter().decode(encoding), date_format)
@@ -101,25 +103,25 @@ private_key=secrets.choice(prime_numbers)
 lab_dh = DH_Endpoint(p, q, private_key)
 lab_parcial_key=lab_dh.generate_partial_key()
 #agora mandar o parcial para o servidor
-params={"partial":lab_parcial_key,"certificate" : cert_buf, "name": "server.crt"}
-resp = requests.post(URL_HOSPITAL+'protocol/dh/', headers = HEADERS ,data=json.dumps(params))
+params={"partial":lab_parcial_key,"certificate" : cert_buf, "name": "Labex.crt"}
+resp = requests.post(URL_HOSPITAL+'protocol/dh/', headers = HEADERS ,data=json.dumps(params),verify=False)
 resp=json.loads(resp.text)
 hospital_key=resp["partial"]
 s_full=lab_dh.generate_full_key(hospital_key)
 print("CHAVE ESCOLHIDA ", s_full)
 ##### IF RUNNING FOR THE FIRST TIME YOU NEED TO SIGNUP
 """
-campos=str({"email":"lab_externo@gmail.com","password":"LAB123xxxx...","username":"lab_externo"})
+campos=str({"email":"lab_externo1111@gmail.com","password":"LAB123xxxx...","username":"lab_externo1111"})
 campos_cipher=lab_dh.encrypt_message(campos)
-params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher}
-resp = requests.post(URL_HOSPITAL+'protocol/signup/', headers = HEADERS ,data=json.dumps(params))
+params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher}
+resp = requests.post(URL_HOSPITAL+'protocol/signup/', headers = HEADERS ,data=json.dumps(params),verify=False)
 
-campos=str({"phone_number":"965432111","address": "Rua do Horácio 123","lab_name":"Laboratório Horácio"})
+campos=str({"phone_number":"965432111","address": "Rua do Horácio 123","lab_name":"Laboratório FERNANDES"})
 campos_cipher=lab_dh.encrypt_message(campos)
-params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher}
-resp = requests.post(URL_HOSPITAL+'protocol/profileExternal/', headers = HEADERS ,data=json.dumps(params))
+params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher}
+resp = requests.post(URL_HOSPITAL+'protocol/profileExternal/', headers = HEADERS ,data=json.dumps(params),verify=False)
+
 """
-
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Signature import PKCS1_v1_5
@@ -130,12 +132,12 @@ import rsa
 
 
 ####
-with open("./keys/server.key", "r") as key_file:
+with open("./Labex.key", "r") as key_file:
     privateKey = rsa.PrivateKey.load_pkcs1(key_file.read())
 
 
 ### NOW LET'S LOGIN 
-campos=str({"password":"LAB123xxxx...","username":"lab_externo"})
+campos=str({"password":"LAB123xxxx...","username":"lab_externo1111"})
 campos_encode=campos.encode()
 
 signature = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
@@ -150,8 +152,8 @@ dt = datetime.now()
 # getting the timestamp
 ts = datetime.timestamp(dt)
 campos_cipher=lab_dh.encrypt_message(campos)
-params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
-resp = requests.post(URL_HOSPITAL+'protocol/login/', headers = HEADERS ,data=json.dumps(params))
+params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
+resp = requests.post(URL_HOSPITAL+'protocol/login/', headers = HEADERS ,data=json.dumps(params),verify=False)
 resp=json.loads(resp.text)
 signature=resp["signature"].encode()
 rsa_pub_key=RSA.importKey(pub_key)
@@ -187,8 +189,8 @@ while True:
         campos_encode=params.encode()
         signature = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
         campos_cipher=lab_dh.encrypt_message(params)
-        params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
-        resp = requests.get(URL_HOSPITAL+'protocol/get-my-exams/', headers = HEADERS ,data=json.dumps(params))
+        params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
+        resp = requests.get(URL_HOSPITAL+'protocol/get-my-exams/', headers = HEADERS ,data=json.dumps(params),verify=False)
         resp=json.loads(resp.text)
         signature=resp["signature"].encode()
         rsa_pub_key=RSA.importKey(pub_key)
@@ -219,8 +221,8 @@ while True:
             campos_encode=params.encode()
             signature = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
             campos_cipher=lab_dh.encrypt_message(params)
-            params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
-            resp = requests.get(URL_HOSPITAL+'protocol/get-exam/', headers = HEADERS ,data=json.dumps(params))
+            params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
+            resp = requests.get(URL_HOSPITAL+'protocol/get-exam/', headers = HEADERS ,data=json.dumps(params),verify=False)
             resp=json.loads(resp.text)
             signature=resp["signature"].encode()
             rsa_pub_key=RSA.importKey(pub_key)
@@ -253,7 +255,7 @@ while True:
         try:
             pacient_id_card=int(input("Insert the patient id card number :"))
             doctor_id_card=int(input("Insert the doctor id card number :"))
-            lab_name="lab_externo"
+            lab_name="lab_externo1111"
             consult_date=input("Insert the consult date  in the format(DD-MM-YYYY) :")
             update_date=input("Insert the update date  in the format(DD-MM-YYYY) :")
             intro=input("Insert a title for this exam:")
@@ -269,8 +271,8 @@ while True:
         campos_encode=params.encode()
         signature = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
         campos_cipher=lab_dh.encrypt_message(params)
-        params={"certificate" : cert_buf, "name": "server.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
-        resp = requests.post(URL_HOSPITAL+'protocol/new-exam/', headers = HEADERS ,data=json.dumps(params))
+        params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
+        resp = requests.post(URL_HOSPITAL+'protocol/new-exam/', headers = HEADERS ,data=json.dumps(params),verify=False)
         resp=json.loads(resp.text)
         signature=resp["signature"].encode()
         rsa_pub_key=RSA.importKey(pub_key)
@@ -294,8 +296,8 @@ while True:
     else:
         print("WRONG OPTION")
 
-params={"certificate" : cert_buf, "name": "server.crt"}
-resp = requests.post(URL_HOSPITAL+'protocol/logout/', headers = HEADERS ,data=json.dumps(params))
+params={"certificate" : cert_buf, "name": "Labex.crt"}
+resp = requests.post(URL_HOSPITAL+'protocol/logout/', headers = HEADERS ,data=json.dumps(params),verify=False)
 
 #####Testes 
 
