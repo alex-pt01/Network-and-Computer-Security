@@ -21,8 +21,8 @@ from ratelimit import limits, RateLimitException, sleep_and_retry
 ONE_MINUTE = 60
 MAX_CALLS_PER_MINUTE = 300
 
-URL_HOSPITAL = "http://192.168.1.4:8003/"
-URL = "http://127.0.0.1:8002/"
+URL_HOSPITAL = "https://192.168.1.4:8003/"
+URL = "https://192.168.1.3:8002/"
 
 HEADERS = {
     "accept": "application/json",
@@ -34,7 +34,7 @@ ACCESS_TOKEN_DICT = {}
 def user_is_authenticated(request, token):
     params = { "token": token }
 
-    resp = requests.post(URL_HOSPITAL+'jwt/verify/', headers = HEADERS ,data=json.dumps(params))
+    resp = requests.post(URL_HOSPITAL+'jwt/verify/', headers = HEADERS ,data=json.dumps(params),verify=False)
     
     print("RESP text", resp.text)
     if resp.text == "{}":
@@ -65,7 +65,7 @@ def login(request):
             try:
                 password = request.POST.get('pass')
                 params = { "username": username, "password": password }
-                resp = requests.post(URL_HOSPITAL+'api/login/', headers = HEADERS ,data=json.dumps(params))
+                resp = requests.post(URL_HOSPITAL+'api/login/', headers = HEADERS ,data=json.dumps(params),verify=False)
                 print("RESP ", resp)
                 tk = json.loads(resp.text)['tokens']['access']
                 if resp.status_code != 200:
@@ -77,7 +77,7 @@ def login(request):
                     request.session['token'] = str(tk)
                     request.session['username'] = username
                     params = { "username": username }
-                    admin_data = requests.get(URL_HOSPITAL+'api/check-is-admin/', headers = HEADERS ,data=json.dumps(params))
+                    admin_data = requests.get(URL_HOSPITAL+'api/check-is-admin/', headers = HEADERS ,data=json.dumps(params),verify=False)
                     print("ttt   ", admin_data.json().get("admin"))
                     request.session['admin'] = admin_data.json().get("admin")
                     print("XXXXX ", request.session['admin'])
@@ -110,7 +110,7 @@ def signup(request):
                 password1 = request.POST.get('password1')
                 #password2 = request.POST.get('password2')
                 params = { "username": username, "email": email, "password": password1}
-                resp = requests.post(URL_HOSPITAL+'api/signup/', headers = HEADERS ,data=json.dumps(params))
+                resp = requests.post(URL_HOSPITAL+'api/signup/', headers = HEADERS ,data=json.dumps(params),verify=False)
                 return redirect('profile')
         return render(request, 'signup.html', {'form': form})
 
@@ -143,7 +143,7 @@ def profile(request):
                 last_name = request.POST.get('last_name')
                 id_card = request.POST.get('id_card')
                 params = {"specialization": specialization, "first_name": first_name, "last_name": last_name, "id_card": id_card}
-                resp = requests.post(URL_HOSPITAL+'api/profile/', headers = headers ,data=json.dumps(params))
+                resp = requests.post(URL_HOSPITAL+'api/profile/', headers = headers ,data=json.dumps(params),verify=False)
                 context = {}
                 return render(request, 'home.html', context)
         return render(request, 'profile.html', {'form': form})
@@ -165,13 +165,13 @@ def doctor_consults(request):
         print("SSSSS")
         #GET doctor profile      
         params = { "username": request.session['username']}
-        doctor = requests.get(URL_HOSPITAL+'api/doctor-profile/',headers = headers,data=json.dumps(params) )
+        doctor = requests.get(URL_HOSPITAL+'api/doctor-profile/',headers = headers,data=json.dumps(params) ,verify=False)
         #Objetc -> enviar como json
         print("doctor  ", doctor.json())
 
         #GET doctor consults
         params_ = { "username": request.session['username'], "doctor_id_card": doctor.json().get("id_card")}
-        response = requests.get(URL_HOSPITAL+'api/doctor-consults/',headers = headers,data=json.dumps(params_) )
+        response = requests.get(URL_HOSPITAL+'api/doctor-consults/',headers = headers,data=json.dumps(params_) ,verify=False)
         print("OOOOO")
         print("RESPONSE ", response.json())
         new_info = []
@@ -179,7 +179,7 @@ def doctor_consults(request):
         for obj in response.json():
             print("OKK ", type(obj))
             params_pacient = { "username": request.session['username'], "id_card": obj.get("pacient_id_card")}
-            pacient_profile = requests.get(URL+'api/pacient-profile-by-id/',headers = headers,data=json.dumps(params_pacient) )
+            pacient_profile = requests.get(URL+'api/pacient-profile-by-id/',headers = headers,data=json.dumps(params_pacient) ,verify=False)
             print(pacient_profile.json().get("first_name"))
             obj["first_name"]=pacient_profile.json().get("first_name")
             obj["last_name"]=pacient_profile.json().get("last_name")
@@ -207,19 +207,19 @@ def consults_management(request):
         }     
         params = { "username": request.session['username']}
 
-        consults = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) )
+        consults = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params),verify=False )
         new_info = []
         #GET pacient profile      
         for obj in consults.json():
             print("OKK ", obj)
             params_pacient = { "username": request.session['username'], "id_card": obj.get("pacient_id_card")}
-            pacient_profile = requests.get(URL+'api/pacient-profile-by-id/',headers = headers,data=json.dumps(params_pacient) )
+            pacient_profile = requests.get(URL+'api/pacient-profile-by-id/',headers = headers,data=json.dumps(params_pacient),verify=False )
             print(pacient_profile.json().get("first_name"))
             obj["first_name_pacient"]=pacient_profile.json().get("first_name")
             obj["last_name_pacient"]=pacient_profile.json().get("last_name")
             
             params_doct = { "username": request.session['username'], "id_card": obj.get("doctor_id_card")}
-            doctor_profile = requests.get(URL_HOSPITAL+'api/doctor-profile-by-id/',headers = headers,data=json.dumps(params_doct) )
+            doctor_profile = requests.get(URL_HOSPITAL+'api/doctor-profile-by-id/',headers = headers,data=json.dumps(params_doct),verify=False )
             print(doctor_profile.json().get("first_name"))
             obj["first_name_doctor"]=doctor_profile.json().get("first_name")
             obj["last_name_doctor"]=doctor_profile.json().get("last_name")
@@ -242,7 +242,7 @@ def deleteConsult(request, id):
         "Authorization": "Bearer " + request.session['token']
         }     
         params = { "username": request.session['username']}
-        resp = requests.delete(URL_HOSPITAL+'api/hosp-consult/'+id, headers = HEADERS ,data=json.dumps(params))
+        resp = requests.delete(URL_HOSPITAL+'api/hosp-consult/'+id, headers = HEADERS ,data=json.dumps(params),verify=False)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -262,7 +262,7 @@ def update_consult(request,id):
 
             if form.is_valid():
                 params_id_cons = { "username": request.session['username'], "id": id}
-                consult_data = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_id_cons) )
+                consult_data = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_id_cons),verify=False )
                 print("FFF ", consult_data.json().get("scheduled_date"))
                 scheduled_date = consult_data.json().get("scheduled_date")
                 consult_date = form.cleaned_data['consult_date']                
@@ -273,7 +273,7 @@ def update_consult(request,id):
 
                 consult = {"scheduled_date":scheduled_date,"consult_date":consult_date,"pacient_id_card":pacient_id_card,"doctor_id_card":doctor_id_card,"status":status,"description":description  }
                 
-                resp = requests.put(URL_HOSPITAL+'api/hosp-consult/'+id, headers = headers ,data=json.dumps(consult,default=str))
+                resp = requests.put(URL_HOSPITAL+'api/hosp-consult/'+id, headers = headers ,data=json.dumps(consult,default=str),verify=False)
                 context = {'username': request.session['username'] }
                 return render(request, 'home.html', context)
 
@@ -281,7 +281,7 @@ def update_consult(request,id):
         else:      
             print("DDDD ",id )
             params_id_cons = { "username": request.session['username'], "id": id}
-            consult_data = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_id_cons) )
+            consult_data = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_id_cons),verify=False )
             context = {'username': request.session['username'], "consult": consult_data.json(), 'form': ConsultForm() }
             return render(request, 'update-consult.html', context)
 
@@ -314,13 +314,13 @@ def create_consult(request):
                 description = form.cleaned_data['description']
                 
                 consult = {"scheduled_date":scheduled_date,"consult_date":consult_date,"pacient_id_card":pacient_id_card,"doctor_id_card":doctor_id_card,"status":status,"description":description  }
-                resp = requests.post(URL_HOSPITAL+'api/create-consult/', headers = headers ,data=json.dumps(consult,default=str))
+                resp = requests.post(URL_HOSPITAL+'api/create-consult/', headers = headers ,data=json.dumps(consult,default=str),verify=False)
                 context = {'username': request.session['username'] }
                 return render(request, 'home.html', context)
         else:      
             params = { "username": request.session['username']}
-            response_doct = requests.get(URL_HOSPITAL+'api/doctors/',headers = headers,data=json.dumps(params) )
-            response_pac = requests.get(URL+'api/pacients/',headers = headers,data=json.dumps(params) )
+            response_doct = requests.get(URL_HOSPITAL+'api/doctors/',headers = headers,data=json.dumps(params),verify=False )
+            response_pac = requests.get(URL+'api/pacients/',headers = headers,data=json.dumps(params),verify=False )
             context = {'username': request.session['username'], "doctors": response_doct.json(),"pacients": response_pac.json(),  'form': ConsultReservationForm() }
             return render(request, 'create-consult.html', context)
     else:
@@ -342,7 +342,7 @@ def rooms_management(request):
         }     
         params = { "username": request.session['username']}
         print("HHHHHHHHHHH")
-        rooms = requests.get(URL_HOSPITAL+'api/all-room-reservations/',headers = headers,data=json.dumps(params) )
+        rooms = requests.get(URL_HOSPITAL+'api/all-room-reservations/',headers = headers,data=json.dumps(params) ,verify=False)
         print(rooms.json())
         new_info = []
         for obj in rooms.json():
@@ -350,7 +350,7 @@ def rooms_management(request):
             print(type(obj.get("consult_id")))
             params_consult = { "username": request.session['username'], "id": obj.get("consult_id")}
 
-            consult = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_consult) )
+            consult = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_consult),verify=False )
             print(consult.json())
             obj["consult_date"]=consult.json().get("consult_date")
             obj["pacient_id_card"]=consult.json().get("pacient_id_card")
@@ -377,7 +377,7 @@ def deleteRoom(request, id):
         "Authorization": "Bearer " + request.session['token']
         }     
         params = { "username": request.session['username']}
-        resp = requests.delete(URL_HOSPITAL+'api/del-room/'+id, headers = HEADERS ,data=json.dumps(params))
+        resp = requests.delete(URL_HOSPITAL+'api/del-room/'+id, headers = HEADERS ,data=json.dumps(params),verify=False)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -404,18 +404,18 @@ def create_room(request):
                 room = form.cleaned_data['room']
                 
                 room_data = {"floor":floor,"room":room,"consult_id":consult_id }
-                resp = requests.post(URL_HOSPITAL+'api/create-room-reservation/', headers = headers ,data=json.dumps(room_data))
+                resp = requests.post(URL_HOSPITAL+'api/create-room-reservation/', headers = headers ,data=json.dumps(room_data),verify=False)
                 context = {'username': request.session['username'] }
                 return render(request, 'home.html', context)
             else:
                 params = { "username": request.session['username']}
-                response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) )
+                response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) ,verify=False)
                 context = {'username': request.session['username'], 'consults': response_consult.json(), 'form': RoomForm() }
                 return render(request, 'create-room.html', context)
         else:      
             params = { "username": request.session['username']}
 
-            response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) )
+            response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) ,verify=False)
             print(response_consult.json())
             context = {'username': request.session['username'], 'consults': response_consult.json(), 'form': RoomForm() }
             return render(request, 'create-room.html', context)
@@ -437,7 +437,7 @@ def external_labs_info(request):
         }     
         params = { "username": request.session['username']}
         print("RRRRR")
-        external_labs = requests.get(URL_HOSPITAL+'api/external-labs/',headers = headers,data=json.dumps(params) )
+        external_labs = requests.get(URL_HOSPITAL+'api/external-labs/',headers = headers,data=json.dumps(params) ,verify=False)
         print(external_labs.json())        
         context = {'username': request.session['username'], "externalLabs": external_labs.json()}
         return render(request, 'external-lab-info.html', context)
@@ -455,7 +455,7 @@ def deleteExternalLab(request, id):
         "Authorization": "Bearer " + request.session['token']
         }     
         params = { "username": request.session['username']}
-        resp = requests.delete(URL_HOSPITAL+'api/del-external-lab/'+id, headers = HEADERS ,data=json.dumps(params))
+        resp = requests.delete(URL_HOSPITAL+'api/del-external-lab/'+id, headers = HEADERS ,data=json.dumps(params),verify=False)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -471,11 +471,11 @@ def external_labs_by_doctor_id_card(request):
         "Authorization": "Bearer " + request.session['token']
         }     
         params = { "username": request.session['username']}
-        response_doct = requests.get(URL_HOSPITAL+'api/doctor-profile/',headers = headers,data=json.dumps(params) )
+        response_doct = requests.get(URL_HOSPITAL+'api/doctor-profile/',headers = headers,data=json.dumps(params),verify=False )
         print("RRRRR", response_doct.json().get("id_card"))
         
         params_ = { "username": request.session['username'], "doctor_id_card": response_doct.json().get("id_card") }
-        external_labs = requests.get(URL_HOSPITAL+'api/external-labs-by-doct_id_card/',headers = headers,data=json.dumps(params_) )
+        external_labs = requests.get(URL_HOSPITAL+'api/external-labs-by-doct_id_card/',headers = headers,data=json.dumps(params_) ,verify=False)
         print(external_labs.json())        
         context = {'username': request.session['username'], "externalLabs": external_labs.json()}
         return render(request, 'external-lab-info-doctor.html', context)
