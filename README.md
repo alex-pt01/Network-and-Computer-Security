@@ -105,7 +105,7 @@ Install OS module. The OS module in python provides functions for interacting wi
 pip3 install os-sys
 ```
 
-To setup our project environment to be used with [VirtualBox](https://www.virtualbox.org/), you need to have 6 instances of VMs.
+To setup our project environment to be used with [SEED-Ubuntu20.04](https://seedsecuritylabs.org/labsetup.html) (username: seeds, password: dees), you need to have 4 instances of VMs.
 
 #TODO -> VERIFICAR!
 
@@ -149,19 +149,7 @@ Then you need to copy the contents of the file [vm4.yml](VMs%20config/vm4.yml)
  and paste into /etc/netplan/01-network-manager-all.yaml on VM4.
  
 
-**VM5: Front Office DB**
-```
-Network adapter 1: Internal Network, name sw-2 (PROMISE MODE: Allow VMS)
-IP:192.168.1.5
-Gateway:192.168.1.254
-```
 
-**VM6: Back Office DB**
-```
-Network adapter 1: Internal Network, name sw-2 (Promiscuous MODE : Allow VMS)
-IP:192.168.1.6
-Gateway:192.168.1.254
-```
 
 #TODO -> alterar os files e os links
 
