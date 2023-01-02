@@ -173,6 +173,7 @@ For each machine, follow the next steps:
 (**NOTE**: do not change the name of the certificates!)
 
 **VM1**
+
 Create 2 folders with the name **CA** and **lab**
 In **CA** folder:
 ```
@@ -199,6 +200,7 @@ open another terminal
 
 
 **VM3**
+
 Open a terminal and put:
 ```
 cd front-office/backend/setup/
@@ -223,6 +225,7 @@ python3 manage.py runsslserver 192.168.1.3:8000 --certificate cert.pem --key key
 
 
 **VM4**
+
 Open a terminal and put:
 cd backoffice/frontend-HOSPITAL/setup
 ```
