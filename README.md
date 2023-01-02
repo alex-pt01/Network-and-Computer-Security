@@ -17,11 +17,11 @@ Briefly in this document you can find general information about the problems tha
 This section expands on the introductory paragraph to give readers a better understanding of your project. 
 Include a brief description and answer the question, "what problem does this project solve?"
 
-Our hospital provides urgent care, open 24/7 (24 hours, 7 days a week) as well as speciality consultations, including: orthopedy, cardiology, and dermatology. ##MAIS????
+Our hospital provides urgent care, open 24/7 (24 hours, 7 days a week) as well as speciality consultations, including: orthopedy, cardiology, and dermatology. 
 
 ### Built With
 
-In order to create the applications we used the django framework with the SQLite database since it allows rapid development of secure and maintainable websites. In order to develop the CA (Certificate Authority) we used OpenSSL that is free, open-source library used for digital certificates and the libraries used for cryptography were: ##TODO 
+In order to create the applications we used the django framework with the SQLite database since it allows rapid development of secure and maintainable websites. In order to develop the CA (Certificate Authority) we used OpenSSL that is free, open-source library used for digital certificates and the libraries used for cryptography were: 
 
 * [Django](https://www.djangoproject.com/) - Python web framework
 * [SQLite](https://www.sqlite.org/index.html) - SQL database engine
@@ -212,14 +212,14 @@ Provide instructions for connecting to servers and tell clients how to obtain ne
 
 ### Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Alexandre Serras** - [alexandreserras](https://github.com/alexandreserras)
+* **Alexandre Rodrigues** - [alex-pt01](https://github.com/alex-pt01)
+* **Ricardo Antunes** - [tunes2000]()
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ### Versioning
 
-We use [SemVer](http://semver.org/) for versioning. 
-For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+Our version is 1.0.0
 
 ### License
 
