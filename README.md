@@ -137,7 +137,7 @@ Adapter 3: associated with NAT.
 Then you need to copy the contents of the file [vm2.yml](VMs%20config/vm2.yml)
  and paste into /etc/netplan/01-network-manager-all.yaml on VM2.
  
-**VM3: Front Office APP**
+**VM3: Front-Office app**
 ```
 Network adapter 1: Internal network, name sw-2 (Promiscuous MODE: Allow VMS)
 IP:192.168.1.3
@@ -146,7 +146,7 @@ Gateway:192.168.1.254
 Then you need to copy the contents of the file [vm3.yml](VMs%20config/vm3.yml)
  and paste into /etc/netplan/01-network-manager-all.yaml on VM3.
  
-**VM4: Back Office APP**
+**VM4: Back-Office app**
 ```
 Network adapter 1: Internal network, name sw-2 (Promiscuous MODE : Allow VMS)
 IP:192.168.1.4
@@ -172,7 +172,7 @@ Then you need to configure the **firewalls** using the following configuration f
 For each machine, follow the next steps:
 (**NOTE**: do not change the name of the certificates!)
 
-**VM1**
+**VM1: Ministry of Health**
 
 Create 2 folders with the name **CA** and **lab**
 In **CA** folder:
@@ -199,7 +199,7 @@ python3 get_keys.py
 open another terminal.
 
 
-**VM3**
+**VM3: Front-Office app**
 
 Open a terminal and put:
 
@@ -225,7 +225,7 @@ mkcert -cert-file cert.pem -key-file key.pem 192.168.1.3 frontoffice  192.168.1.
 python3 manage.py runsslserver 192.168.1.3:8000 --certificate cert.pem --key key.pem
 ```
 
-**VM4**
+**VM4: Back-Office app**
 
 Open a terminal and put:
 
