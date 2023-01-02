@@ -64,14 +64,13 @@ class LoginView(APIView):
     def post(self, request: Request):
         username = request.data.get("username")
         password = request.data.get("password")
-
         user = authenticate(username=username, password=password)
         if user is not None:
             tokens = create_jwt_pair_for_user(user)
             response = {"message": "Login Successfull", "tokens": tokens}
             return Response(data=response, status=status.HTTP_200_OK)
         else:
-            return Response(data={"message": "Invalid username or password"})
+            return Response(data={"message": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request: Request):
         content = {"user": str(request.user), "auth": str(request.auth)}
