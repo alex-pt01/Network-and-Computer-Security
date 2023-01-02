@@ -190,7 +190,7 @@ openssl rsa -in Labex.key -pubout > Lab_public.key
 openssl req -new -key Labex.key -out Labex.csr  
 openssl x509 -req -days 365 -in Labex.csr -CA ../CA/CA.crt -CAkey ../CA/CA.key -out Labex.crt
 ```
-Go back to folder CA again:
+Go back to folder **CA** again:
 
 Copy the get_keys.py file and run it simulating the CA
 ```
@@ -202,8 +202,9 @@ open another terminal
 **VM3**
 
 Open a terminal and put:
-```
+
 cd front-office/backend/setup/
+```
 openssl genrsa -out FrontBack.key
 openssl rsa -in FrontBack.key -pubout > FrontBack_public.key
 openssl req -new -key FrontBack.key -out FrontBack.csr  
