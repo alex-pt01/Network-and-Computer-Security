@@ -14,7 +14,7 @@ ONE_MINUTE = 60
 MAX_CALLS_PER_MINUTE = 300
 
 URL = "https://192.168.1.3:8002/"
-URL_HOSPITAL = "http://192.168.1.4:8004/"
+URL_HOSPITAL = "https://192.168.1.4:8003/"
 
 HEADERS = {
     "accept": "application/json",
