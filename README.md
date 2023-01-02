@@ -196,17 +196,6 @@ Give an example command
 Give a tour of the best features of the application.
 Add screenshots when relevant.
 
-## Deployment
-
-Add additional notes about how to deploy this on a live system e.g. a host or a cloud provider.
-
-Mention virtualization/container tools and commands.
-
-```
-Give an example command
-```
-
-Provide instructions for connecting to servers and tell clients how to obtain necessary permissions.
 
 ## Additional Information
 
