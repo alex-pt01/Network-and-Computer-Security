@@ -252,6 +252,7 @@ python3 manage.py runsslserver 192.168.1.4:8003 --certificate cert.pem --key key
 Now everything is running!
 
 Back to **VM1**:
+
 cd lab
 ```
 python3 ExternalLab.py (with this it will be possible to generate exams from external labs where our protocol is applied)
