@@ -205,7 +205,6 @@ Add screenshots when relevant.
 * **Alexandre Rodrigues** - [alex-pt01](https://github.com/alex-pt01)
 * **Ricardo Antunes** - [tunes2000]()
 
-
 ### Versioning
 
 Our version is 1.0.0
@@ -220,9 +219,20 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ### Acknowledgments
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+We would like to thank all the teachers who helped us in the development of this project, namely:
+* **André Mendes** - andre.i.mendes@tecnico.ulisboa.pt
+* **Miguel de Oliveira Guerreiro** - oliveira.guerreiro@tecnico.ulisboa.pt
+* **Ricardo Chavess** - ricardo.chaves@tecnico.ulisboa.pt
+
+
+
+
+
+
+
+
+
+
 
 
 # **5. Healthcare: SAH**
@@ -274,24 +284,7 @@ python3 manage.py runserver
 npx kill-port 8000
 ```
 
-**BD Django -> mysql workbench**
-```
-sudo snap install mysql-workbench-community
-sudo apt-get install gnome-keyring
-sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
-sudo mysql
 
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_new_password';
-
-pip install wheel
-pip install pymysql
-
-Dentro do django:
-no file init na pasta settings meter
-
-import pymysql
-pymysql.install_as_MySQLdb(
-```
 
 
 **HELP**
