@@ -156,10 +156,6 @@ Then you need to copy the contents of the file [vm4.yml](VMs%20config/vm4.yml)
  and paste into /etc/netplan/01-network-manager-all.yaml on VM4.
  
 
-
-
-#TODO -> alterar os files e os links
-
 Then you need to configure the **firewalls** using the following configuration files:
 
 * [Firewall configuration file for VM2](Firewalls%20config/firewall_VM2.txt)
@@ -253,6 +249,13 @@ mkcert -cert-file cert.pem -key-file key.pem 192.168.1.4 frontoffice  192.168.1.
 python3 manage.py runsslserver 192.168.1.4:8003 --certificate cert.pem --key key.pem
 ```
 
+Now everything is running!
+
+Back to **VM1**:
+cd lab
+```
+python3 ExternalLab.py (with this it will be possible to generate exams from external labs where our protocol is applied)
+```
 
 ### Testing
 
@@ -283,15 +286,11 @@ Add screenshots when relevant.
 
 ### Versioning
 
-Our version is 1.0.0
+Our version is 1.0.0.
 
 ### License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-### Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### Acknowledgments
 
