@@ -100,6 +100,11 @@ Install RSA library. It supports encryption and decryption, signing and verifyin
 pip3 install rsa
 ```
 
+Install OS module. The OS module in python provides functions for interacting with the operating system´´´
+```
+pip3 install os-sys
+```
+
 To setup our project environment to be used with [VirtualBox](https://www.virtualbox.org/), you need to have 6 instances of VMs.
 
 #TODO -> VERIFICAR!
