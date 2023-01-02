@@ -255,7 +255,8 @@ Back to **VM1**:
 
 cd lab
 ```
-python3 ExternalLab.py (with this it will be possible to generate exams from external labs where our protocol is applied)
+python3 ExternalLab.py 
+(with this it will be possible to generate exams from external labs where our protocol is applied)
 ```
 
 ### Testing
