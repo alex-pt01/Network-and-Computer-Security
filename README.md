@@ -169,21 +169,34 @@ Then you need to configure the **firewalls** using the following configuration f
 
 ### Installing
 
-Give step-by-step instructions on building and running the application on the development environment. 
+For each machine, follow the next steps:
+(**NOTE**: do not change the name of the certificates!)
 
-Describe the step.
-
+**VM1**
+* Create 2 folders with the name **CA** and **lab**
+* In **CA** folder:
 ```
-Give the command example
+openssl genrsa -out CA.key
+openssl rsa -in CA.key -pubout > public.key
+openssl req -new -key CA.key -out CA.csr 
+openssl x509 -req -days 365 -in CA.csr -signkey CA.key -out CA.crt
+echo 01 > CA.srl
 ```
-
-And repeat.
-
+* In **lab** folder:
 ```
-until finished
+openssl genrsa -out Labex.key
+openssl rsa -in Labex.key -pubout > Lab_public.key
+openssl req -new -key Labex.key -out Labex.csr  
+openssl x509 -req -days 365 -in Labex.csr -CA ../CA/CA.crt -CAkey ../CA/CA.key -out Labex.crt
 ```
+* Go back to folder CA again:
 
-You can also add screenshots to show expected results, when relevant.
+Copy the get_keys.py file and run it simulating the CA
+```
+python3 get_keys.py 
+```
+open another terminal
+
 
 ### Testing
 
