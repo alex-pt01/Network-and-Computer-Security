@@ -173,8 +173,8 @@ For each machine, follow the next steps:
 (**NOTE**: do not change the name of the certificates!)
 
 **VM1**
-* Create 2 folders with the name **CA** and **lab**
-* In **CA** folder:
+Create 2 folders with the name **CA** and **lab**
+In **CA** folder:
 ```
 openssl genrsa -out CA.key
 openssl rsa -in CA.key -pubout > public.key
@@ -182,20 +182,70 @@ openssl req -new -key CA.key -out CA.csr
 openssl x509 -req -days 365 -in CA.csr -signkey CA.key -out CA.crt
 echo 01 > CA.srl
 ```
-* In **lab** folder:
+In **lab** folder:
 ```
 openssl genrsa -out Labex.key
 openssl rsa -in Labex.key -pubout > Lab_public.key
 openssl req -new -key Labex.key -out Labex.csr  
 openssl x509 -req -days 365 -in Labex.csr -CA ../CA/CA.crt -CAkey ../CA/CA.key -out Labex.crt
 ```
-* Go back to folder CA again:
+Go back to folder CA again:
 
 Copy the get_keys.py file and run it simulating the CA
 ```
 python3 get_keys.py 
 ```
 open another terminal
+
+
+**VM3**
+Open a terminal and put:
+```
+cd front-office/backend/setup/
+openssl genrsa -out FrontBack.key
+openssl rsa -in FrontBack.key -pubout > FrontBack_public.key
+openssl req -new -key FrontBack.key -out FrontBack.csr  
+python3 receive_signatures.py FrontBack.csr (assumes mkcert is already installed)
+mkcert -cert-file cert.pem -key-file key.pem 192.168.1.3 frontoffice  192.168.1.3 ::1
+python3 manage.py runsslserver 192.168.1.3:8002 --certificate cert.pem --key key.pem
+```
+
+Open a **new** terminal and put:
+cd front-office/frontend/setup/
+```
+openssl genrsa -out FrontFront.key
+openssl rsa -in FrontFront.key -pubout > FrontFront_public.key
+openssl req -new -key FrontFront.key -out FrontFront.csr  
+python3 receive_signatures.py FrontFront.csr (assumes mkcert is already installed)
+mkcert -cert-file cert.pem -key-file key.pem 192.168.1.3 frontoffice  192.168.1.3  ::1
+python3 manage.py runsslserver 192.168.1.3:8000 --certificate cert.pem --key key.pem
+```
+
+
+**VM4**
+Open a terminal and put:
+cd backoffice/frontend-HOSPITAL/setup
+```
+openssl genrsa -out BackOffice.key
+openssl rsa -in BackOffice.key -pubout > BackOffice_public.key
+openssl req -new -key BackOffice.key -out BackOffice.csr  
+python3 receive_signatures.py BackOffice.csr
+mkcert -cert-file cert.pem -key-file key.pem 192.168.1.4 frontoffice  192.168.1.4 ::1
+python3 manage.py runsslserver 192.168.1.4:8001 --certificate cert.pem --key key.pem
+```
+
+Open a **new** terminal and put:
+cd backoffice/backend-HOSPITAL/setup
+```
+mkdir keys
+openssl genrsa -out server.key
+openssl rsa -in server.key -pubout > server_public.key
+openssl req -new -key server.key -out server.csr 
+python3 receive_signatures.py server.csr
+cd .. (setup directory)
+mkcert -cert-file cert.pem -key-file key.pem 192.168.1.4 frontoffice  192.168.1.4 ::1
+python3 manage.py runsslserver 192.168.1.4:8003 --certificate cert.pem --key key.pem
+```
 
 
 ### Testing
