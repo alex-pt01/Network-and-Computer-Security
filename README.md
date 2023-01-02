@@ -196,7 +196,7 @@ Copy the get_keys.py file and run it simulating the CA
 ```
 python3 get_keys.py 
 ```
-open another terminal
+open another terminal.
 
 
 **VM3**
@@ -214,6 +214,7 @@ python3 manage.py runsslserver 192.168.1.3:8002 --certificate cert.pem --key key
 ```
 
 Open a **new** terminal and put:
+
 cd front-office/frontend/setup/
 ```
 openssl genrsa -out FrontFront.key
@@ -224,10 +225,10 @@ mkcert -cert-file cert.pem -key-file key.pem 192.168.1.3 frontoffice  192.168.1.
 python3 manage.py runsslserver 192.168.1.3:8000 --certificate cert.pem --key key.pem
 ```
 
-
 **VM4**
 
 Open a terminal and put:
+
 cd backoffice/frontend-HOSPITAL/setup
 ```
 openssl genrsa -out BackOffice.key
@@ -239,6 +240,7 @@ python3 manage.py runsslserver 192.168.1.4:8001 --certificate cert.pem --key key
 ```
 
 Open a **new** terminal and put:
+
 cd backoffice/backend-HOSPITAL/setup
 ```
 mkdir keys
