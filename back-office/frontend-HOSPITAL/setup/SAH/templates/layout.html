@@ -74,12 +74,14 @@
                                         <li><a href="{% url "rooms-management" %}" >Rooms Management</a></li>
                                         <li><a href="{% url "external-labs-info" %}" >External Labs Info</a></li>
 
-                                    {% else %}
+                                    {% elif username != None %}
 
 
                                         <li><a href="{% url "home" %}" >Home</a></li>
                                         <li><a href="{% url "doctor-consults" %}" >Consults</a></li>
                                         <li><a href="{% url "external-labs-info-doctor" %}" >Doctor - External Labs </a></li>
+                                    {% else %}
+                                    <li><a href="{% url "home" %}" >Home</a></li>
                                     {%  endif %}
 
                                   
