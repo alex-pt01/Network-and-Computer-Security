@@ -18,6 +18,9 @@ import json
 import requests
 from ratelimit import limits, RateLimitException, sleep_and_retry
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 ONE_MINUTE = 60
 MAX_CALLS_PER_MINUTE = 300
 
@@ -48,8 +51,11 @@ def user_is_authenticated(request, token):
 def home(request):
     if 'username' in request.session:
         context = {'username': request.session['username']}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'home.html', context)
     else:  
+        
         return render(request, 'home.html', {})
 
 @sleep_and_retry
@@ -58,6 +64,8 @@ def login(request):
     print(request.session)
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         context = {'username': request.session['username']}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'home.html', context)
     else:
         if request.method == 'POST':
@@ -91,6 +99,8 @@ def login(request):
                 context = {}
                 return render(request, 'login.html', context)
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 @sleep_and_retry
@@ -98,6 +108,8 @@ def login(request):
 def signup(request):
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         context = {'username': request.session['username']}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'home.html', context)
     else:
         form = newUserForm()
@@ -132,6 +144,8 @@ def profile(request):
     if 'token' in request.session and user_is_authenticated(request, request.session.get('token')):
         messages.info(request, 'You are already registered')
         context = {'username': request.session['username']}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'home.html', context)
     else:
         form = doctorProfile()
@@ -145,6 +159,8 @@ def profile(request):
                 params = {"specialization": specialization, "first_name": first_name, "last_name": last_name, "id_card": id_card}
                 resp = requests.post(URL_HOSPITAL+'api/profile/', headers = headers ,data=json.dumps(params),verify=False)
                 context = {}
+                if request.session['admin']:
+                    context['admin']=request.session['admin']
                 return render(request, 'home.html', context)
         return render(request, 'profile.html', {'form': form})
 
@@ -189,9 +205,13 @@ def doctor_consults(request):
         print("NEWW ", type(new_info))
 
         context = {'username': request.session['username'], "consults": new_info}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'doctor-consults.html', context)
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 @sleep_and_retry
@@ -228,10 +248,14 @@ def consults_management(request):
 
         print("NEWW!!!!! ", type(new_info))
         context = {'username': request.session['username'], "consults": new_info}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'consults-management.html', context)
 
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 def deleteConsult(request, id):
@@ -275,6 +299,8 @@ def update_consult(request,id):
                 
                 resp = requests.put(URL_HOSPITAL+'api/hosp-consult/'+id, headers = headers ,data=json.dumps(consult,default=str),verify=False)
                 context = {'username': request.session['username'] }
+                if request.session['admin']:
+                    context['admin']=request.session['admin']
                 return render(request, 'home.html', context)
 
 
@@ -283,10 +309,14 @@ def update_consult(request,id):
             params_id_cons = { "username": request.session['username'], "id": id}
             consult_data = requests.get(URL_HOSPITAL+'api/hospital-consult-by-id/',headers = headers,data=json.dumps(params_id_cons),verify=False )
             context = {'username': request.session['username'], "consult": consult_data.json(), 'form': ConsultForm() }
+            if request.session['admin']:
+                context['admin']=request.session['admin']
             return render(request, 'update-consult.html', context)
 
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 @sleep_and_retry
@@ -316,15 +346,21 @@ def create_consult(request):
                 consult = {"scheduled_date":scheduled_date,"consult_date":consult_date,"pacient_id_card":pacient_id_card,"doctor_id_card":doctor_id_card,"status":status,"description":description  }
                 resp = requests.post(URL_HOSPITAL+'api/create-consult/', headers = headers ,data=json.dumps(consult,default=str),verify=False)
                 context = {'username': request.session['username'] }
+                if request.session['admin']:
+                    context['admin']=request.session['admin']
                 return render(request, 'home.html', context)
         else:      
             params = { "username": request.session['username']}
             response_doct = requests.get(URL_HOSPITAL+'api/doctors/',headers = headers,data=json.dumps(params),verify=False )
             response_pac = requests.get(URL+'api/pacients/',headers = headers,data=json.dumps(params),verify=False )
             context = {'username': request.session['username'], "doctors": response_doct.json(),"pacients": response_pac.json(),  'form': ConsultReservationForm() }
+            if request.session['admin']:
+                context['admin']=request.session['admin']   
             return render(request, 'create-consult.html', context)
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 #---------------------------------------------------------------
@@ -334,6 +370,7 @@ def create_consult(request):
 def rooms_management(request):
     print("ROOMS MANAGEMENT")
     print(request.session['token'])
+    print(request.session)
     if 'token' in request.session and user_is_authenticated(request, request.session['token']):
         headers = {
         "accept": "application/json",
@@ -359,10 +396,14 @@ def rooms_management(request):
             new_info.append(obj)
         print("BBB ", new_info)
         context = {'username': request.session['username'], "rooms": new_info}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'rooms-management.html', context)
 
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 
@@ -377,6 +418,7 @@ def deleteRoom(request, id):
         "Authorization": "Bearer " + request.session['token']
         }     
         params = { "username": request.session['username']}
+        
         resp = requests.delete(URL_HOSPITAL+'api/del-room/'+id, headers = HEADERS ,data=json.dumps(params),verify=False)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -395,6 +437,7 @@ def create_room(request):
             form = RoomForm(request.POST, request.FILES)
             params = { "username": request.session['username']}
             print("FFFF") 
+
             print(form)
             if form.is_valid():
                 print("SSSSSSS")
@@ -406,11 +449,15 @@ def create_room(request):
                 room_data = {"floor":floor,"room":room,"consult_id":consult_id }
                 resp = requests.post(URL_HOSPITAL+'api/create-room-reservation/', headers = headers ,data=json.dumps(room_data),verify=False)
                 context = {'username': request.session['username'] }
+                if request.session['admin']:
+                    context['admin']=request.session['admin']
                 return render(request, 'home.html', context)
             else:
                 params = { "username": request.session['username']}
                 response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) ,verify=False)
                 context = {'username': request.session['username'], 'consults': response_consult.json(), 'form': RoomForm() }
+                if request.session['admin']:
+                    context['admin']=request.session['admin']
                 return render(request, 'create-room.html', context)
         else:      
             params = { "username": request.session['username']}
@@ -418,9 +465,13 @@ def create_room(request):
             response_consult = requests.get(URL_HOSPITAL+'api/all-consults/',headers = headers,data=json.dumps(params) ,verify=False)
             print(response_consult.json())
             context = {'username': request.session['username'], 'consults': response_consult.json(), 'form': RoomForm() }
+            if request.session['admin']:
+                context['admin']=request.session['admin']
             return render(request, 'create-room.html', context)
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 #External Labs------------------------
@@ -428,6 +479,7 @@ def create_room(request):
 @limits(calls=MAX_CALLS_PER_MINUTE, period=ONE_MINUTE)
 def external_labs_info(request):
     print("EXTERNAL MANAGEMENT")
+    print(request.session['admin'])
     print(request.session['token'])
     if 'token' in request.session and user_is_authenticated(request, request.session['token']):
         headers = {
@@ -440,9 +492,13 @@ def external_labs_info(request):
         external_labs = requests.get(URL_HOSPITAL+'api/external-labs/',headers = headers,data=json.dumps(params) ,verify=False)
         print(external_labs.json())        
         context = {'username': request.session['username'], "externalLabs": external_labs.json()}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'external-lab-info.html', context)
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
 
 @sleep_and_retry
@@ -478,7 +534,11 @@ def external_labs_by_doctor_id_card(request):
         external_labs = requests.get(URL_HOSPITAL+'api/external-labs-by-doct_id_card/',headers = headers,data=json.dumps(params_) ,verify=False)
         print(external_labs.json())        
         context = {'username': request.session['username'], "externalLabs": external_labs.json()}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'external-lab-info-doctor.html', context)
     else:
         context = {}
+        if request.session['admin']:
+            context['admin']=request.session['admin']
         return render(request, 'login.html', context)
