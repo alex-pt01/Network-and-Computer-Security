@@ -13,7 +13,7 @@ import secrets
 from DH import DH_Endpoint
 #prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 17624813, 37139213, 50728129, 77557187, 131807699, 174440041, 259336153, 326851121, 368345293, 440817757, 563167303, 718064159, 751783477, 997525853, 1107276647, 1170710369, 1367161723,52711, 648391, 9737333, 37139213, 174440041, 326851121, 718064159, 997525853, 1559861749, 2724711961, 3657500101, 5545806481, 7069067389, 8012791231, 9672485827, 12501968177, 16123689073, 16917026909, 22742734291,709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 14161729, 17624813, 19734581, 23391799, 29499439, 37139213, 38790341, 50728129, 56011909, 59053067, 68425619, 77557187, 87019979, 101146501, 113256643, 119535373, 127065427,	648391, 9737333, 174440041, 718064159, 3657500101, 7069067389, 16123689073, 22742734291, 36294260117, 64988430769, 88362852307, 136395369829, 175650481151, 200147986693, 243504973489, 318083817907, 414507281407]
 #prime_numbers=[5381, 52711, 648391, 2269733, 9737333, 52711, 648391, 9737333, 709, 5381, 52711, 167449, 648391, 1128889, 2269733, 3042161, 4535189, 7474967, 9737333, 648391, 9737333, 15299, 87803, 219613, 318211, 506683, 919913, 1254739, 1471343, 1828669, 2364361, 3338989, 3509299, 4030889, 5054303, 5823667, 6478961, 6816631, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
-prime_numbers=[5381, 52711, 648391, 52711, 648391, 709, 5381, 52711, 167449, 648391, 648391, 15299, 87803, 219613, 318211, 506683, 919913, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873]
+prime_numbers=[5381, 52711, 648391, 52711, 648391, 709, 5381, 52711, 167449, 648391, 648391, 15299, 87803, 219613, 318211, 506683, 919913, 1787, 8527, 19577, 27457, 42043, 72727, 96797, 112129, 137077, 173867, 239489, 250751, 285191, 352007, 401519, 443419, 464939, 490643, 527623, 683873,1279, 2203, 2281, 3217, 4253, 4423, 9689, 9941, 11213, 19937, 21701, 23209, 44497, 86243, 110503, 132049, 216091,359, 383, 431, 439, 479, 503, 719, 839, 863, 887, 983, 1103, 1319, 1367, 1399, 1433, 1439, 1487, 1823, 1913, 2039, 2063, 2089, 2207, 2351, 2383, 2447, 2687, 2767, 2879, 2903, 2999, 3023, 3119, 3167, 3343]
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -38,7 +38,7 @@ with open("./Labex.crt", "r") as f:
 
 #name é o nome do certicado com o .crt
 params={"certificate" : cert_buf, "name": "Labex.crt"}
-
+print(params)
 resp = requests.post(URL_HOSPITAL+'protocol/hello/', headers = HEADERS ,data=json.dumps(params),verify=False)
 resp=json.loads(resp.text)
 name=resp["name"]
@@ -100,6 +100,8 @@ else:
 p=resp["p"]
 q=resp["q"]
 private_key=secrets.choice(prime_numbers)
+while private_key!= p and private_key != q :
+    private_key=secrets.choice(prime_numbers)
 lab_dh = DH_Endpoint(p, q, private_key)
 lab_parcial_key=lab_dh.generate_partial_key()
 #agora mandar o parcial para o servidor
@@ -151,10 +153,14 @@ dt = datetime.now()
 
 # getting the timestamp
 ts = datetime.timestamp(dt)
+print("login parametros pré cifra ",campos)
 campos_cipher=lab_dh.encrypt_message(campos)
+print("Login campos_cifrados ", campos_cipher)
 params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
+print("login parametros " , params)
 resp = requests.post(URL_HOSPITAL+'protocol/login/', headers = HEADERS ,data=json.dumps(params),verify=False)
 resp=json.loads(resp.text)
+print("Resposta ao login ", resp)
 signature=resp["signature"].encode()
 rsa_pub_key=RSA.importKey(pub_key)
 campus=resp["response"]
@@ -168,6 +174,7 @@ except:
     print("fake server")
     exit()
 ###CHECK SERVER SIGNATURE
+print("resposta descodificada " , initial_message)
 if campus_dec_final["message"] == "Login Successfull":
     HEADERS["Authorization"]="Bearer "+campus_dec_final["tokens"]["access"]
 else:
@@ -221,9 +228,12 @@ while True:
             campos_encode=params.encode()
             signature = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
             campos_cipher=lab_dh.encrypt_message(params)
+            print("CIFRADOS OS PARAMETROS " , campos_cipher)
+            
             params={"certificate" : cert_buf, "name": "Labex.crt","data":campos_cipher,"signature":(signature.decode()),"hash":"SHA-512","ts":ts}
             resp = requests.get(URL_HOSPITAL+'protocol/get-exam/', headers = HEADERS ,data=json.dumps(params),verify=False)
             resp=json.loads(resp.text)
+            print("DADOS PRÉ DECIFRAR " , resp)
             signature=resp["signature"].encode()
             rsa_pub_key=RSA.importKey(pub_key)
             campus=resp["response"]
@@ -231,6 +241,7 @@ while True:
             campus_dec = campus_dec.replace("\'", "\"")
             campus_dec_final=json.loads(campus_dec)
             initial_message=str(campus_dec_final).encode()
+
             try:
                 verify = rsa.verify(initial_message, b64decode(signature), rsa_pub_key)
             except:
@@ -239,7 +250,7 @@ while True:
             hash_=campus_dec_final["hash"].encode()
             del campus_dec_final["hash"]
             del campus_dec_final["id"]
-
+            print("O MEU RELATÓRIO ", campus_dec_final)
             validate_values=str(campus_dec_final)
             campos_encode=validate_values.encode()
             signature = b64encode(rsa.sign(campos_encode, privateKey, "SHA-512"))
@@ -253,7 +264,9 @@ while True:
             print("That options doesn't exist")
     elif option=="2":
         try:
+            # 1234567890
             pacient_id_card=int(input("Insert the patient id card number :"))
+            # 123456785
             doctor_id_card=int(input("Insert the doctor id card number :"))
             lab_name="lab_externo1111"
             consult_date=input("Insert the consult date  in the format(DD-MM-YYYY) :")
