@@ -26,6 +26,11 @@ In order to create the applications we used the django framework with the SQLite
 * [Django](https://www.djangoproject.com/) - Python web framework
 * [SQLite](https://www.sqlite.org/index.html) - SQL database engine
 * [OpenSSL](https://www.openssl.org/) -  Programming library used to implement encryption and authentication
+* [Pycrypto](https://pypi.org/project/pycrypto/) - Collection of both secure hash functions (such as SHA256), and various encryption algorithms (AES, DES, RSA, etc.)
+* [Rsa](https://pypi.org/project/rsa/) - Supports encryption and decryption, signing and verifying signatures, and key generation according to PKCS#1.
+* [Python-secrets](https://pypi.org/project/python-secrets/) - Manages groups of secrets (passwords, API keys, etc) and other project variables.
+* [Cryptography](https://pypi.org/project/cryptography/) - Package which provides cryptographic recipes and primitives to Python developers.
+
 
 ## Getting Started
 
