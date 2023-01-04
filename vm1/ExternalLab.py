@@ -27,7 +27,7 @@ HEADERS = {
 }
 
 
-URL_HOSPITAL = "https://192.168.1.4:8003/"
+URL_HOSPITAL = "http://192.168.1.4:8003/"
 
 hospital_data={}
 
@@ -313,6 +313,3 @@ params={"certificate" : cert_buf, "name": "Labex.crt"}
 resp = requests.post(URL_HOSPITAL+'protocol/logout/', headers = HEADERS ,data=json.dumps(params),verify=False)
 
 #####Testes 
-
-
-

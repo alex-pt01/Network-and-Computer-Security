@@ -131,8 +131,7 @@ REST_FRAMEWORK = {
 #CORS
 CORS_ORIGIN_ALLOW_ALL = True
 
-SECURE_SSL_REDIRECT=True
-SECURE_REDIRECT_EXEMPT=("protocol/*", r"protocol/$")
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
