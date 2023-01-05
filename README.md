@@ -331,8 +331,7 @@ Internet e BackOffice frontend side.
 
 ## Demo
 
-Give a tour of the best features of the application.
-Add screenshots when relevant.
+* [DEMO](https://www.youtube.com/watch?v=EVWp20Btp-8&ab_channel=alexandrealexandre)
 
 
 ## Additional Information
@@ -357,87 +356,3 @@ We would like to thank all the teachers who helped us in the development of this
 * **André Mendes** - andre.i.mendes@tecnico.ulisboa.pt
 * **Miguel de Oliveira Guerreiro** - oliveira.guerreiro@tecnico.ulisboa.pt
 * **Ricardo Chavess** - ricardo.chaves@tecnico.ulisboa.pt
-
-
-
-
-
-
-
-
-
-
-
-
-# **5. Healthcare: SAH**
-
-## **Website**
-```
-ADMIN
-username: adminsirs
-password: @adsirs123
-
-DOCTOR
-username: doctorAlex
-password: @sirs1234
-
-PACIENT
-username: peter 
-password: @sirs1234
-```
-
-
-**Requirements**
-```
-virtualenv django
-source django/bin/activate
-python3 -m pip install django
-python3 -m pip install django-allauth
-pip3 install django-sslserver
-pip3 install django-debug-toolbar
-pip3 install django-createsuperuser
-pip3 install djangorestframework
-pip3 install django-cors-headers
-pip3 install serializers
-pip3 install djangorestframework-simplejwt
-pip3 install ratelimit
-pip3 install pyOpenSSL
-pip install rsa
-
-
-```
-
-**START working**
-```
-source ~/.bash_profile
-conda activate django
-
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 manage.py runserver
-npx kill-port 8000
-```
-
-
-
-
-**HELP**
-```
-1. Remove all the migration files
-find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-find . -path "*/migrations/*.pyc"  -delete
-
-2. Delete db.sqlite3
-rm db.sqlite3
-
-3. Create and run the migrations:
-python manage.py makemigrations
-python manage.py migrate
-
-4. Sync the database:
-manage.py migrate --run-syncdb
-```
-
-
-
-
