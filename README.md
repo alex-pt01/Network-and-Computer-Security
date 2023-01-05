@@ -320,6 +320,8 @@ Internet e FrontOffice frontend side.
   <img src="images_test/10.png" style="width: 40%;
     height: auto;" />
 </p>
+
+
 Internet e BackOffice frontend side.
 
 <p >
