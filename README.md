@@ -265,13 +265,17 @@ python3 ExternalLab.py
 
 ### Testing
 
-Explain how to run the automated tests for this system.
+VM3
+<p align="center">
+  <img src="images_test/img1.png" style="width: 40%;
+    height: auto;" />
+</p>
 
-Give users explicit instructions on how to run all necessary tests. 
-Explain the libraries, such as JUnit, used for testing your software and supply all necessary commands.
-
-Explain what these tests test and why
-
+VM1
+<p align="center">
+  <img src="images_test/img2.png" style="width: 40%;
+    height: auto;" />
+</p>
 ```
 Give an example command
 ```
