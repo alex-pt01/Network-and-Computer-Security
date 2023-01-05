@@ -266,64 +266,64 @@ python3 ExternalLab.py
 ### Testing
 VM3
 <p >
-  <img src="images_test/img1.png" style="width: 40%;
+  <img src="images_test/1.png" style="width: 40%;
     height: auto;" />
 </p>
 
 VM1
 <p >
-  <img src="images_test/img2.png" style="width: 40%;
+  <img src="images_test/2.png" style="width: 40%;
     height: auto;" />
 </p>
 
 2 screenshots of pings,ssh, telnet attempts on **VM1** to the inside
 <p >
-  <img src="images_test/img3.png" style="width: 40%;
+  <img src="images_test/3.png" style="width: 40%;
     height: auto;" />
 </p>
 <p >
-  <img src="images_test/img4.png" style="width: 40%;
+  <img src="images_test/4.png" style="width: 40%;
     height: auto;" />
 </p>
 VM1 FIRST (LAB EXTERNAL)
 <p >
-  <img src="images_test/img4.png" style="width: 40%;
+  <img src="images_test/5.png" style="width: 40%;
     height: auto;" />
 </p>
 
 ...and VM4 proving that they chose the same key.
 <p >
-  <img src="images_test/img5.png" style="width: 40%;
+  <img src="images_test/6.png" style="width: 40%;
     height: auto;" />
 </p>
 
 VM1 example of response arriving at vm1 before deciphering
 <p >
-  <img src="images_test/img6.png" style="width: 40%;
+  <img src="images_test/7.png" style="width: 40%;
     height: auto;" />
 </p>
 ... deciphered answer.
 
 <p >
-  <img src="images_test/img7.png" style="width: 40%;
+  <img src="images_test/8.png" style="width: 40%;
     height: auto;" />
 </p>
 Example how data between external lab and hospital circulates on the network.
 
 <p >
-  <img src="images_test/img8.png" style="width: 40%;
+  <img src="images_test/9.png" style="width: 40%;
     height: auto;" />
 </p>
 Internet e FrontOffice frontend side.
 
 <p >
-  <img src="images_test/img9.png" style="width: 40%;
+  <img src="images_test/10.png" style="width: 40%;
     height: auto;" />
 </p>
 Internet e BackOffice frontend side.
 
 <p >
-  <img src="images_test/img10.png" style="width: 40%;
+  <img src="images_test/11.png" style="width: 40%;
     height: auto;" />
 </p>
 
