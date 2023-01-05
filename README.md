@@ -285,6 +285,7 @@ VM1
   <img src="images_test/4.png" style="width: 40%;
     height: auto;" />
 </p>
+
 VM1 FIRST (LAB EXTERNAL)
 <p >
   <img src="images_test/5.png" style="width: 40%;
@@ -302,28 +303,26 @@ VM1 example of response arriving at vm1 before deciphering
   <img src="images_test/7.png" style="width: 40%;
     height: auto;" />
 </p>
-... deciphered answer.
 
+... deciphered answer.
 <p >
   <img src="images_test/8.png" style="width: 40%;
     height: auto;" />
 </p>
-Example how data between external lab and hospital circulates on the network.
 
+Example how data between external lab and hospital circulates on the network.
 <p >
   <img src="images_test/9.png" style="width: 40%;
     height: auto;" />
 </p>
-Internet e FrontOffice frontend side.
 
+Internet e FrontOffice frontend side.
 <p >
   <img src="images_test/10.png" style="width: 40%;
     height: auto;" />
 </p>
 
-
 Internet e BackOffice frontend side.
-
 <p >
   <img src="images_test/11.png" style="width: 40%;
     height: auto;" />
