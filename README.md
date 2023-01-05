@@ -250,8 +250,7 @@ openssl rsa -in server.key -pubout > server_public.key
 openssl req -new -key server.key -out server.csr 
 python3 receive_signatures.py server.csr
 cd .. (setup directory)
-mkcert -cert-file cert.pem -key-file key.pem 192.168.1.4 frontoffice  192.168.1.4 ::1
-python3 manage.py runsslserver 192.168.1.4:8003 --certificate cert.pem --key key.pem
+python3 manage.py runserver 192.168.1.4:8003 
 ```
 
 Now everything is running!
