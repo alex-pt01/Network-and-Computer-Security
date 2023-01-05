@@ -266,13 +266,13 @@ python3 ExternalLab.py
 ### Testing
 
 VM3
-<p align="center">
+<p >
   <img src="images_test/img1.png" style="width: 40%;
     height: auto;" />
 </p>
 
 VM1
-<p align="center">
+<p >
   <img src="images_test/img2.png" style="width: 40%;
     height: auto;" />
 </p>
