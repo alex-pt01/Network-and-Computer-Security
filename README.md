@@ -276,9 +276,56 @@ VM1
   <img src="images_test/img2.png" style="width: 40%;
     height: auto;" />
 </p>
-```
-Give an example command
-```
+
+2 screenshots of pings,ssh, telnet attempts on **VM1** to the inside
+<p >
+  <img src="images_test/img3.png" style="width: 40%;
+    height: auto;" />
+</p>
+<p >
+  <img src="images_test/img4.png" style="width: 40%;
+    height: auto;" />
+</p>
+
+VM1 FIRST (LAB EXTERNAL) and VM4 proving that they chose the same key.
+<p >
+  <img src="images_test/img4.png" style="width: 40%;
+    height: auto;" />
+</p>
+
+<p >
+  <img src="images_test/img5.png" style="width: 40%;
+    height: auto;" />
+</p>
+
+VM1 example of response arriving at vm1 before deciphering
+<p >
+  <img src="images_test/img6.png" style="width: 40%;
+    height: auto;" />
+</p>
+
+... deciphered answer.
+<p >
+  <img src="images_test/img7.png" style="width: 40%;
+    height: auto;" />
+</p>
+
+Example how data between external lab and hospital circulates on the network.
+<p >
+  <img src="images_test/img8.png" style="width: 40%;
+    height: auto;" />
+</p>
+
+Internet e FrontOffice frontend side.
+<p >
+  <img src="images_test/img9.png" style="width: 40%;
+    height: auto;" />
+</p>
+Internet e BackOffice frontend side.
+<p >
+  <img src="images_test/img10.png" style="width: 40%;
+    height: auto;" />
+</p>
 
 ## Demo
 
