@@ -1,3 +1,5 @@
+Grade: 18/20
+
 # Healthcare: SAH
 <p align="center">
   <img src="logo.png" style="width: 40%;
